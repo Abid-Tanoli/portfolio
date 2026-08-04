@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type NextFunction, type Request, type Response } from "express";
 import { z } from "zod";
 import { asyncHandler } from "./_helpers.js";
 import { sendContactEmail } from "../services/mailer.js";
@@ -13,8 +13,29 @@ const contactSchema = z.object({
 
 export const contactRouter = Router();
 
+const WINDOW_MS = 15 * 60_000;
+const MAX_PER_IP = 10;
+const hits = new Map<string, { count: number; windowStart: number }>();
+
+function rateLimit(req: Request, res: Response, next: NextFunction) {
+  const ip = req.ip ?? "unknown";
+  const now = Date.now();
+  const entry = hits.get(ip);
+  if (!entry || now - entry.windowStart > WINDOW_MS) {
+    hits.set(ip, { count: 1, windowStart: now });
+    return next();
+  }
+  if (entry.count >= MAX_PER_IP) {
+    res.status(429).json({ error: "Too many messages. Please wait a few minutes and try again." });
+    return;
+  }
+  entry.count += 1;
+  return next();
+}
+
 contactRouter.post(
   "/",
+  rateLimit,
   asyncHandler(async (req, res) => {
     const parsed = contactSchema.safeParse(req.body);
     if (!parsed.success) {

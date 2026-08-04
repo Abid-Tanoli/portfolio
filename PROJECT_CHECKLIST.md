@@ -2,7 +2,7 @@
 
 Status legend: `[ ]` pending | `[~]` in progress / partially verified | `[x]` done + verified.
 
-Last verification pass: 2026-08-03
+Last verification pass: 2026-08-04
 
 ## Phase 1 - Research & analysis
 - [x] Fetch GitHub user profile via REST API (12 repos, created 2024-06-21)
@@ -22,7 +22,8 @@ Last verification pass: 2026-08-03
 - [x] Backend: Express app, health route, CORS, JSON parsing, not-found and error middleware
 - [x] Backend: GitHub proxy service + disk cache for user/repos/events
 - [x] Backend: projects merge endpoint at `GET /api/projects` (verified by local API smoke; returned `github+curated`)
-- [~] Backend: contact route with Zod + Nodemailer SMTP (implemented; live sending blocked by SMTP credentials)
+- [~] Backend: contact route with Zod + Nodemailer SMTP (implemented + rate-limited; live sending blocked by SMTP credentials)
+- [x] Backend: rate limiting on `/api/contact` (in-memory, 10 req / 15 min per IP)
 - [x] Frontend: Tailwind v4 theme tokens, dark/light globals, self-hosted fonts
 - [x] Frontend: layout shell - Navbar, Footer, ThemeToggle, MobileNav, skip-link
 - [x] Frontend: Hero with CTAs, animated subline, profile slot, reduced-motion support
@@ -54,10 +55,10 @@ Last verification pass: 2026-08-03
 - [x] Wire resume PDF into /resume route (verified by browser smoke)
 
 ## Verification Completed
-- [x] `npm run typecheck --prefix Backend` passed
-- [x] `npm run build --prefix Backend` passed
+- [x] `npm run typecheck --prefix Backend` passed (2026-08-04)
+- [x] Backend live smoke passed 2026-08-04: `/api/health` (db connected), `/api/projects`, `/api/github/user`, `/api/contact` (503 when SMTP unconfigured)
 - [x] `npm run build` passed, including Vite production build and prerender
-- [x] Local backend smoke passed: `GET /api/health` and `GET /api/projects`
+- [x] Lint clean (only fast-refresh dev warnings)
 - [x] Browser smoke passed for `/`, `/about`, `/projects`, project detail routes, `/certifications`, `/resume`, `/github`, `/contact`, and 404
 
 ## Final QA
