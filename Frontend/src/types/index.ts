@@ -6,6 +6,9 @@ export interface Certification {
   credential?: string;
 }
 
+export type { Experience, Education } from "./experience";
+export type { Project, EnrichedProject } from "./project";
+
 export interface SkillGroup {
   id: string;
   title: string;

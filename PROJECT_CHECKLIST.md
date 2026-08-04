@@ -1,63 +1,74 @@
-# PROJECT_CHECKLIST.md — Living checklist
+﻿# PROJECT_CHECKLIST.md - Living checklist
 
-Status legend: `[ ]` pending · `[~]` in progress · `[x]` done + verified (actually run/tested).
+Status legend: `[ ]` pending | `[~]` in progress / partially verified | `[x]` done + verified.
 
-## Phase 1 — Research & analysis
+Last verification pass: 2026-08-03
+
+## Phase 1 - Research & analysis
 - [x] Fetch GitHub user profile via REST API (12 repos, created 2024-06-21)
 - [x] Fetch full repo list + descriptions/languages/stars/dates (12 repos enumerated)
 - [x] Fetch READMEs for key repos (BQ-PLAY/CricAll, LowPriceMart, Event-Organizer, tourist-places-guide)
-- [x] Attempt github-readme-stats.vercel.app → 503; fallback: compute stats server-side from API
-- [x] Attempt Vercel dashboard enumeration → auth required; collected evidence from repo metadata (eventorganizer-five.vercel.app configured; cricall-user/cricall-admin documented)
-- [x] Attempt Railway dashboard → auth required; identified as BQ-PLAY backend per CV/DEPLOYMENT.md
+- [x] Attempt github-readme-stats.vercel.app -> 503; fallback: compute stats server-side from API
+- [x] Attempt Vercel dashboard enumeration -> auth required; collected evidence from repo metadata
+- [x] Attempt Railway dashboard -> auth required; identified as BQ-PLAY backend from available evidence
 - [x] Write ANALYSIS.md
-- [x] Gap analysis complete (photo/screenshots/certs placeholders; CV phrasing; finance narrative; repo-vs-CV expansion; testimonials empty state)
+- [x] Complete gap analysis: photo/screenshots/certs placeholders, CV phrasing, finance narrative, repo expansion, testimonials empty state
 
-## Phase 2 — Plan
-- [x] Write PLAN.md (revised: React frontend + Express backend per user decision)
+## Phase 2 - Plan
+- [x] Write PLAN.md with revised architecture: React/Vite frontend + Node/Express backend
 
-## Phase 3 — Build
-- [~] Scaffold monorepo (Frontend Vite + Backend Express, TS strict)
-- [ ] Backend: Express app, health route, error middleware
-- [ ] Backend: GitHub proxy service + disk cache (user/repos/events)
-- [ ] Backend: projects merge endpoint
-- [ ] Backend: contact route (Zod + Nodemailer SMTP)
-- [ ] Frontend: Tailwind v4 theme tokens (dark/light) + globals
-- [ ] Frontend: layout shell — Navbar, Footer, ThemeToggle, MobileNav, skip-link
-- [ ] Frontend: Hero (typed subline, gradient blobs, parallax, CTAs, profile slot)
-- [ ] Frontend: About (summary, highlights, goals) + UploadableImage
-- [ ] Frontend: Skills grid (5 groups per taxonomy + Deployment)
-- [ ] Frontend: Projects grid + filters + detail pages (merged data, status badges)
-- [ ] Frontend: Experience + Education timelines (developer-first emphasis)
-- [ ] Frontend: Certifications grid (5 certs, upload slots)
-- [ ] Frontend: Resume route (PDF viewer + download)
-- [ ] Frontend: Contact form + social rail (phone shown per user, LinkedIn placeholder pending URL)
-- [ ] Frontend: Testimonials (honest empty state)
-- [ ] Frontend: Achievements (verifiable facts only)
-- [ ] Frontend: Stats counters (live counts, not guessed)
-- [ ] Frontend: GitHub page (stats, top languages, recent activity heatmap)
-- [ ] Frontend: Global animation pass (reveals, cursor, counters) + reduced-motion
-- [ ] Frontend: Responsive pass (mobile/tablet/desktop, no h-scroll)
-- [ ] Frontend: Accessibility pass (keyboard, contrast, aria, focus)
-- [ ] Frontend: SEO pass (meta hook, sitemap, robots, JSON-LD, OG image)
-- [ ] Frontend: Performance pass (code splitting, lazy images, Lighthouse ≥ 90 verified)
-- [ ] Frontend: NotFound page + error boundary
-- [ ] Root: git commits per section (conventional)
-- [ ] Deploy backend to Railway (blocked on credentials — see DEPLOYMENT.md)
-- [ ] Deploy frontend to Vercel (blocked on credentials — see DEPLOYMENT.md)
+## Phase 3 - Build
+- [x] Scaffold monorepo: Frontend Vite + Backend Express, TypeScript strict (verified by frontend build + backend typecheck)
+- [x] Backend: Express app, health route, CORS, JSON parsing, not-found and error middleware
+- [x] Backend: GitHub proxy service + disk cache for user/repos/events
+- [x] Backend: projects merge endpoint at `GET /api/projects` (verified by local API smoke; returned `github+curated`)
+- [~] Backend: contact route with Zod + Nodemailer SMTP (implemented; live sending blocked by SMTP credentials)
+- [x] Frontend: Tailwind v4 theme tokens, dark/light globals, self-hosted fonts
+- [x] Frontend: layout shell - Navbar, Footer, ThemeToggle, MobileNav, skip-link
+- [x] Frontend: Hero with CTAs, animated subline, profile slot, reduced-motion support
+- [x] Frontend: About summary, highlights, career goals, UploadableImage profile slot
+- [x] Frontend: Skills grid with taxonomy groups plus Deployment
+- [x] Frontend: Projects grid + detail pages, status badges, GitHub-enriched project data
+- [x] Frontend: Experience + Education timelines with developer-first emphasis
+- [x] Frontend: Certifications grid with upload slots
+- [x] Frontend: Resume route with embedded PDF/download (resume asset copy fixed and smoke-tested)
+- [x] Frontend: Contact form + social rail with LinkedIn pending state
+- [x] Frontend: Testimonials honest empty state
+- [x] Frontend: Achievements from verifiable facts
+- [x] Frontend: Stats counters using curated + GitHub-backed counts
+- [x] Frontend: GitHub page with profile stats, top languages, top repos, activity heatmap/feed
+- [x] Frontend: Global animation pass: scroll reveals, counters, cursor, reduced-motion handling
+- [~] Frontend: Responsive pass (routes smoke-tested; manual breakpoint visual QA still pending)
+- [~] Frontend: Accessibility pass (semantic/labeled UI present; full keyboard/contrast audit still pending)
+- [x] Frontend: SEO pass - meta hook, sitemap, robots, JSON-LD, OG image assets
+- [~] Frontend: Performance pass (production build/prerender verified; Lighthouse >= 90 still pending)
+- [x] Frontend: NotFound page + ErrorBoundary
+- [x] Root: DEPLOYMENT.md runbook added
+- [ ] Deploy backend to Railway (blocked on Railway access/service URL)
+- [ ] Deploy frontend to Vercel (blocked on Vercel login/token)
 - [ ] Wire Vercel Analytics + Speed Insights
-- [ ] Write DEPLOYMENT.md runbook
 
-## Phase 5 — Resume
-- [ ] Generate ATS-friendly resume.html from portfolio copy
-- [ ] Render to content/resume.pdf (headless Edge print)
-- [ ] Wire into /resume route
+## Phase 5 - Resume
+- [x] Generate ATS-friendly resume.html from portfolio copy (content/resume.html exists)
+- [x] Render resume PDF to content/resume.pdf (file exists and is copied into Frontend/public during build)
+- [x] Wire resume PDF into /resume route (verified by browser smoke)
+
+## Verification Completed
+- [x] `npm run typecheck --prefix Backend` passed
+- [x] `npm run build --prefix Backend` passed
+- [x] `npm run build` passed, including Vite production build and prerender
+- [x] Local backend smoke passed: `GET /api/health` and `GET /api/projects`
+- [x] Browser smoke passed for `/`, `/about`, `/projects`, project detail routes, `/certifications`, `/resume`, `/github`, `/contact`, and 404
 
 ## Final QA
-- [ ] Full end-to-end QA: all pages, both themes, 3 breakpoints, dev server logs clean
-- [ ] Every item above confirmed [x], not [~]
+- [~] Full end-to-end QA: route smoke passed; manual mobile/tablet/desktop/theme QA still pending
+- [ ] Lighthouse Performance/Accessibility/Best Practices/SEO >= 90 verified
+- [ ] Production deployment URLs verified
+- [ ] Every non-blocked checklist item confirmed `[x]`
 
-## Blocked items (need human input)
-- [ ] LinkedIn URL (user chose custom URL but no string provided) → placeholder slot in Contact
-- [ ] Vercel CLI token / login → needed for final deployment
-- [ ] Railway account access → verify backend service URL for badges
-- [ ] SMTP credentials → wire live email sending (form already built against env vars)
+## Blocked items needing human input
+- [ ] LinkedIn URL
+- [ ] Vercel CLI token / login for frontend deployment
+- [ ] Railway account access / backend public URL confirmation
+- [ ] SMTP credentials for live contact form sending
+- [ ] Vercel Analytics + Speed Insights decision/account access

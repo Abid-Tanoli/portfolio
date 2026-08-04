@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(import.meta.dirname, './src'),
     },
   },
   server: {
@@ -21,14 +21,5 @@ export default defineConfig({
   },
   build: {
     target: 'es2022',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'motion': ['framer-motion'],
-          'forms': ['react-hook-form', 'zod', '@hookform/resolvers'],
-        },
-      },
-    },
   },
 })

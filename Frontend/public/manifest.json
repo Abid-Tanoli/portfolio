@@ -1,0 +1,17 @@
+{
+  "name": "Abid Ali Tanoli — Full Stack MERN Developer",
+  "short_name": "Abid Tanoli",
+  "description": "Portfolio of Abid Ali Tanoli: Full Stack Web Developer (MERN), AI-augmented development, financial analysis.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08090b",
+  "theme_color": "#08090b",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

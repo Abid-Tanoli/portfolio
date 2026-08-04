@@ -1,4 +1,5 @@
-import { Github, Linkedin, Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
+import { GitHubIcon, LinkedInIcon } from "@/components/shared/icons";
 import { profile } from "@/data/profile";
 
 export const navLinks = [
@@ -12,12 +13,12 @@ export const navLinks = [
 ];
 
 export const socials = [
-  { label: "GitHub", href: profile.github, icon: Github },
+  { label: "GitHub", href: profile.github, icon: GitHubIcon },
   {
     label: "LinkedIn",
     href: profile.linkedin,
     pending: profile.linkedinPending,
-    icon: Linkedin,
+    icon: LinkedInIcon,
   },
   { label: "Email", href: `mailto:${profile.email}`, icon: Mail },
 ];
@@ -35,7 +36,7 @@ export const contactRail = [
     label: "LinkedIn",
     value: profile.linkedinPending ? "URL coming soon" : profile.linkedin,
     href: profile.linkedin || undefined,
-    icon: Linkedin,
+    icon: LinkedInIcon,
     pending: profile.linkedinPending,
   },
 ];

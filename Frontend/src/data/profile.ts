@@ -1,4 +1,10 @@
-import type { Experience, Education } from "@/types";
+import type {
+  Achievement,
+  Certification,
+  Education,
+  Experience,
+  SkillGroup,
+} from "@/types";
 
 export const profile = {
   name: "Abid Ali Tanoli",

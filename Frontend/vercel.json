@@ -1,0 +1,22 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/projects", "destination": "/projects.html" },
+    { "source": "/projects/bq-play", "destination": "/projects_bq-play.html" },
+    { "source": "/projects/lowpricemart", "destination": "/projects_lowpricemart.html" },
+    { "source": "/projects/event-organizer", "destination": "/projects_event-organizer.html" },
+    { "source": "/projects/tourist-places-guide", "destination": "/projects_tourist-places-guide.html" },
+    { "source": "/certifications", "destination": "/certifications.html" },
+    { "source": "/resume", "destination": "/resume.html" },
+    { "source": "/github", "destination": "/github.html" },
+    { "source": "/contact", "destination": "/contact.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/content/images/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, immutable" }]
+    }
+  ]
+}

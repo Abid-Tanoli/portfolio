@@ -1,7 +1,8 @@
-import express from "express";
+﻿import express from "express";
 import cors from "cors";
 import { githubRouter } from "./routes/github.js";
 import { contactRouter } from "./routes/contact.js";
+import { projectsRouter } from "./routes/projects.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.js";
 import { isDbConnected } from "./services/db.js";
 
@@ -36,7 +37,9 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/github", githubRouter);
+app.use("/api/projects", projectsRouter);
 app.use("/api/contact", contactRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
+

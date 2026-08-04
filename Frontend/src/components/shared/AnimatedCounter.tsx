@@ -52,7 +52,7 @@ export function AnimatedCounter({
   }, [value, duration, suffix, prefix, reduced]);
 
   return (
-    <span ref={ref} aria-label={`${prefix}${value}${suffix}`}>
+    <span ref={ref} suppressHydrationWarning aria-label={`${prefix}${value}${suffix}`}>
       {reduced ? `${prefix}${value}${suffix}` : `${prefix}0${suffix}`}
     </span>
   );

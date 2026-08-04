@@ -1,32 +1,30 @@
-import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
+import { useReveal } from "@/hooks/useReveal";
+import { cn } from "@/lib/utils";
 
 interface ScrollRevealProps {
   children: ReactNode;
   delay?: number;
   y?: number;
   className?: string;
-  once?: boolean;
 }
 
-export function ScrollReveal({
-  children,
-  delay = 0,
-  y = 24,
-  className,
-  once = true,
-}: ScrollRevealProps) {
-  const prefersReduced = useReducedMotion();
+export function ScrollReveal({ children, delay = 0, y = 24, className }: ScrollRevealProps) {
+  const { ref, inView } = useReveal();
 
   return (
-    <motion.div
-      className={className}
-      initial={prefersReduced ? false : { opacity: 0, y }}
-      whileInView={prefersReduced ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once, margin: "-60px" }}
-      transition={{ duration: 0.55, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
+    <div
+      ref={ref}
+      suppressHydrationWarning
+      className={cn("reveal", inView && "reveal-in", className)}
+      style={
+        {
+          transitionDelay: `${delay}ms`,
+          "--reveal-y": `${y}px`,
+        } as React.CSSProperties
+      }
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

@@ -1,122 +1,152 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { lazy, Suspense, useEffect, useState, type ComponentType, type ReactNode } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Layout } from "@/components/layout/Layout";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { Skeleton } from "@/components/ui/skeleton";
+import { profile } from "@/data/profile";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+function LazyBoundary({ children }: { children: ReactNode }) {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  return hydrated ? <Suspense fallback={<PageFallback />}>{children}</Suspense> : children;
 }
 
-export default App
+type SyncThenable<T> = {
+  then: (onFulfilled: (value: T) => unknown, onRejected?: (reason: unknown) => unknown) => unknown;
+  status?: string;
+  value?: T;
+};
+
+function syncThenable<T>(promise: Promise<T>): SyncThenable<T> {
+  let value: T | undefined;
+  let fulfilled = false;
+  promise.then((m) => {
+    value = m;
+    fulfilled = true;
+  });
+  return {
+    then(onFulfilled, onRejected) {
+      if (fulfilled) {
+        onFulfilled(value as T);
+        return undefined;
+      }
+      return promise.then(onFulfilled, onRejected);
+    },
+  };
+}
+
+function lazyRoute(loader: Promise<{ default: unknown }>) {
+  return lazy(() => syncThenable(loader) as unknown as Promise<{ default: ComponentType }>);
+}
+
+const HomeModule = import("@/pages/Home");
+const AboutModule = import("@/pages/About");
+const ProjectsModule = import("@/pages/Projects");
+const ProjectDetailModule = import("@/pages/ProjectDetail");
+const CertificationsModule = import("@/pages/Certifications");
+const ResumeModule = import("@/pages/Resume");
+const ContactModule = import("@/pages/Contact");
+const GithubModule = import("@/pages/Github");
+const NotFoundModule = import("@/pages/NotFound");
+
+const Home = lazyRoute(HomeModule);
+const About = lazyRoute(AboutModule);
+const Projects = lazyRoute(ProjectsModule);
+const ProjectDetail = lazyRoute(ProjectDetailModule);
+const Certifications = lazyRoute(CertificationsModule);
+const Resume = lazyRoute(ResumeModule);
+const Contact = lazyRoute(ContactModule);
+const Github = lazyRoute(GithubModule);
+const NotFound = lazyRoute(NotFoundModule);
+
+export function preloadRoute(pathname: string): Promise<unknown> {
+  const path = (pathname.split("?")[0].replace(/\/+$/, "") || "/").toLowerCase();
+  switch (path) {
+    case "/":
+      return HomeModule;
+    case "/about":
+      return AboutModule;
+    case "/projects":
+      return ProjectsModule;
+    case "/certifications":
+      return CertificationsModule;
+    case "/resume":
+      return ResumeModule;
+    case "/contact":
+      return ContactModule;
+    case "/github":
+      return GithubModule;
+    default:
+      return path.startsWith("/projects/") ? ProjectDetailModule : NotFoundModule;
+  }
+}
+
+function PageFallback() {
+  return (
+    <div className="mx-auto flex min-h-[60vh] max-w-6xl flex-col gap-4 px-6 py-24">
+      <Skeleton className="h-10 w-2/3 max-w-md" />
+      <Skeleton className="h-4 w-full max-w-2xl" />
+      <Skeleton className="h-4 w-full max-w-xl" />
+      <Skeleton className="mt-6 h-64 w-full rounded-xl" />
+    </div>
+  );
+}
+
+function JsonLd() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: profile.name,
+    jobTitle: "Full Stack Web Developer (MERN)",
+    email: `mailto:${profile.email}`,
+    telephone: profile.phone,
+    address: { "@type": "PostalAddress", addressLocality: "Karachi", addressCountry: "PK" },
+    url: "https://abidtanoli.vercel.app",
+    sameAs: [profile.github, profile.linkedin].filter(Boolean),
+    knowsAbout: [
+      "MERN Stack",
+      "React.js",
+      "Node.js",
+      "Express.js",
+      "MongoDB",
+      "AI-Augmented Development",
+      "Financial Analysis",
+    ],
+    worksFor: [
+      {
+        "@type": "Organization",
+        name: "Bano Qabil Incubation Center",
+      },
+      { "@type": "Organization", name: "AK Electronics" },
+    ],
+  };
+
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />;
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <BrowserRouter>
+        <JsonLd />
+        <LazyBoundary>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/projects/:slug" element={<ProjectDetail />} />
+              <Route path="/certifications" element={<Certifications />} />
+              <Route path="/resume" element={<Resume />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/github" element={<Github />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </LazyBoundary>
+      </BrowserRouter>
+    </ErrorBoundary>
+  );
+}
