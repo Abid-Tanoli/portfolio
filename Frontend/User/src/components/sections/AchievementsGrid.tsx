@@ -13,6 +13,7 @@ const ICONS: Record<string, typeof Trophy> = {
 };
 
 export function AchievementsGrid() {
+  const { achievements } = usePortfolio();
   return (
     <section id="achievements" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
       <SectionHeading

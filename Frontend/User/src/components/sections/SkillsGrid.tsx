@@ -4,8 +4,10 @@ import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { Card } from "@/components/ui/card";
 import { useReveal } from "@/hooks/useReveal";
 import { cn } from "@/lib/utils";
+import type { SkillGroup } from "@/types";
 
 export function SkillsGrid({ limit }: { limit?: number }) {
+  const { skillGroups } = usePortfolio();
   const groups = limit ? skillGroups.slice(0, limit) : skillGroups;
 
   return (
@@ -27,7 +29,7 @@ export function SkillsGrid({ limit }: { limit?: number }) {
   );
 }
 
-function SkillGroupCard({ group }: { group: (typeof skillGroups)[number] }) {
+function SkillGroupCard({ group }: { group: SkillGroup }) {
   const { ref, inView } = useReveal<HTMLDivElement>();
 
   return (

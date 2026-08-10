@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
-import { contactRail } from "@/lib/constants";
+import { buildContactRail } from "@/lib/socials";
+import { usePortfolio } from "@/context/PortfolioContext";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,8 @@ type SubmitState =
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
 export function ContactForm() {
+  const { profile } = usePortfolio();
+  const contactRail = buildContactRail(profile);
   const [submitState, setSubmitState] = useState<SubmitState>({ status: "idle" });
   const {
     register,

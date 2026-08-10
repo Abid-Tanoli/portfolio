@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export function CertificationsGrid() {
+  const { certifications } = usePortfolio();
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {certifications.map((cert, i) => (
