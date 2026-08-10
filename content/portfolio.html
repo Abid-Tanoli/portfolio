@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Abid Ali Tanoli — Professional Portfolio</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Segoe UI", Calibri, Arial, Helvetica, sans-serif;
+    color: #17181c;
+    font-size: 10pt;
+    line-height: 1.5;
+    background: #fff;
+  }
+  a { color: #4f46e5; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Cover */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4f46e5 100%);
+    color: #fff;
+    padding: 48px 40px;
+    page-break-after: always;
+  }
+  .cover-photo {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255,255,255,0.35);
+    margin-bottom: 28px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
+  .cover h1 { font-size: 32pt; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .cover .subtitle { font-size: 13pt; opacity: 0.92; max-width: 520px; line-height: 1.55; margin-bottom: 6px; }
+  .cover .tagline { font-size: 10.5pt; opacity: 0.78; margin-bottom: 28px; }
+  .cover .contact-row { font-size: 9.5pt; opacity: 0.88; line-height: 1.8; }
+  .cover .contact-row a { color: #c7d2fe; }
+  .cover .badge-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 24px; }
+  .cover .badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 8.5pt;
+    letter-spacing: 0.3px;
+  }
+  .cover .doc-label {
+    margin-top: 36px;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.55;
+  }
+
+  /* Content pages */
+  .page { padding: 0 44px 32px; }
+  .page-break { page-break-before: always; }
+
+  /* TOC */
+  .toc { page-break-after: always; padding: 40px 44px; }
+  .toc h2 {
+    font-size: 18pt;
+    color: #1e1b4b;
+    border-bottom: 3px solid #4f46e5;
+    padding-bottom: 8px;
+    margin-bottom: 24px;
+  }
+  .toc ol { list-style: none; counter-reset: toc; }
+  .toc li {
+    counter-increment: toc;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 0;
+    border-bottom: 1px dotted #d1d5db;
+    font-size: 10.5pt;
+  }
+  .toc li::before { content: counter(toc, decimal-leading-zero) ". "; color: #4f46e5; font-weight: 600; min-width: 28px; }
+  .toc li a { color: #17181c; flex: 1; }
+  .toc li .dots { flex: 1; border-bottom: 1px dotted #ccc; margin: 0 8px; min-width: 20px; }
+
+  /* Section headings */
+  h2.section-title {
+    font-size: 16pt;
+    color: #1e1b4b;
+    border-left: 4px solid #4f46e5;
+    padding-left: 12px;
+    margin: 0 0 16px;
+    page-break-after: avoid;
+  }
+  h3.sub-title {
+    font-size: 11pt;
+    color: #312e81;
+    margin: 14px 0 6px;
+    page-break-after: avoid;
+  }
+  .eyebrow {
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #4f46e5;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  p { margin-bottom: 8px; color: #374151; }
+  .lead { font-size: 10.5pt; line-height: 1.6; }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 16px 0 20px;
+  }
+  .stat-box {
+    background: #f5f3ff;
+    border: 1px solid #e0e7ff;
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .stat-box .num { font-size: 18pt; font-weight: 700; color: #4f46e5; line-height: 1.1; }
+  .stat-box .lbl { font-size: 7.5pt; color: #6b7280; margin-top: 4px; line-height: 1.3; }
+
+  /* Two column layout */
+  .two-col { display: flex; gap: 24px; }
+  .two-col > div { flex: 1; }
+  .about-photo {
+    width: 100%;
+    max-width: 180px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid #e0e7ff;
+  }
+
+  /* Skills */
+  .skill-group { margin-bottom: 12px; page-break-inside: avoid; }
+  .skill-group .sg-title { font-weight: 700; color: #1e1b4b; font-size: 10pt; margin-bottom: 2px; }
+  .skill-group .sg-desc { font-size: 8.5pt; color: #6b7280; margin-bottom: 4px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .pill {
+    background: #eef2ff;
+    color: #3730a3;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 8pt;
+    border: 1px solid #c7d2fe;
+  }
+
+  /* Experience / entries */
+  .entry { margin-bottom: 14px; page-break-inside: avoid; }
+  .entry-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+  .entry .role { font-weight: 700; color: #17181c; }
+  .entry .org { font-weight: 600; color: #4f46e5; }
+  .entry .period { font-style: italic; color: #6b7280; font-size: 9pt; white-space: nowrap; }
+  .entry .summary { font-size: 9.5pt; color: #4b5563; margin-bottom: 4px; }
+  ul { padding-left: 16px; margin-top: 2px; }
+  li { margin-bottom: 2px; font-size: 9.5pt; color: #374151; }
+
+  /* Projects */
+  .project-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    page-break-inside: avoid;
+    background: #fafafa;
+  }
+  .project-card.featured { border-left: 4px solid #4f46e5; background: #fafbff; }
+  .project-card .pc-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .project-card .pc-name { font-size: 11pt; font-weight: 700; color: #1e1b4b; }
+  .project-card .pc-tagline { font-size: 9pt; color: #6b7280; }
+  .status-badge {
+    display: inline-block;
+    font-size: 7.5pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+  }
+  .status-live { background: #dcfce7; color: #166534; }
+  .status-progress { background: #fef3c7; color: #92400e; }
+  .status-archived { background: #f3f4f6; color: #4b5563; }
+  .status-verify { background: #fee2e2; color: #991b1b; }
+  .project-detail { page-break-before: always; }
+  .project-detail:first-of-type { page-break-before: auto; }
+  .project-screenshot {
+    width: 100%;
+    max-height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    margin: 10px 0;
+  }
+  .links-row { margin-top: 6px; font-size: 9pt; }
+  .links-row a { margin-right: 14px; font-weight: 600; }
+
+  /* Certifications & achievements */
+  .cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cert-item, .ach-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    page-break-inside: avoid;
+  }
+  .cert-item .ci-title, .ach-item .ai-title { font-weight: 700; font-size: 9.5pt; color: #1e1b4b; }
+  .cert-item .ci-issuer, .ach-item .ai-detail { font-size: 8.5pt; color: #6b7280; margin-top: 2px; }
+
+  /* GitHub section */
+  .gh-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }
+  .gh-stat { text-align: center; background: #f9fafb; border-radius: 8px; padding: 12px; border: 1px solid #e5e7eb; }
+  .gh-stat .gs-num { font-size: 16pt; font-weight: 700; color: #4f46e5; }
+  .gh-stat .gs-lbl { font-size: 8pt; color: #6b7280; }
+  .repo-list { margin-top: 10px; }
+  .repo-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6; font-size: 9pt; }
+  .repo-item .rn { font-family: Consolas, monospace; color: #4f46e5; font-weight: 600; }
+  .lang-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 10px 0; }
+  .lang-seg { height: 100%; }
+  .lang-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 8pt; color: #6b7280; }
+
+  /* Tech cloud */
+  .tech-cloud { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tech-tag {
+    background: linear-gradient(135deg, #eef2ff, #f0fdf4);
+    border: 1px solid #c7d2fe;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 8.5pt;
+    color: #3730a3;
+  }
+
+  /* Contact */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .contact-item {
+    background: #f5f3ff;
+    border-radius: 8px;
+    padding: 12px 14px;
+    border: 1px solid #e0e7ff;
+  }
+  .contact-item .cl-label { font-size: 8pt; text-transform: uppercase; letter-spacing: 0.8px; color: #6b7280; }
+  .contact-item .cl-value { font-size: 10pt; font-weight: 600; color: #1e1b4b; margin-top: 2px; }
+
+  /* Resume info box */
+  .resume-box {
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #4f46e5;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 12px;
+  }
+
+  /* Footer note */
+  .footer-note { text-align: center; font-size: 8pt; color: #9ca3af; margin-top: 20px; padding-top: 12px; border-top: 1px solid #e5e7eb; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ COVER PAGE ═══════════════ -->
+<section class="cover">
+  <img class="cover-photo" src="images/profile.jpg" alt="Abid Ali Tanoli" />
+  <h1>Abid Ali Tanoli</h1>
+  <div class="subtitle">Full Stack Web Developer (MERN)</div>
+  <div class="tagline">MERN · AI-Augmented Development · REST APIs · Financial Analysis</div>
+  <div class="contact-row">
+    Karachi, Pakistan<br />
+    <a href="mailto:visionaryabidi@gmail.com">visionaryabidi@gmail.com</a> · +92 332 3178928<br />
+    <a href="https://github.com/Abid-Tanoli">github.com/Abid-Tanoli</a>
+  </div>
+  <div class="badge-row">
+    <span class="badge">React &amp; Node.js</span>
+    <span class="badge">MongoDB &amp; Express</span>
+    <span class="badge">AI-Augmented Dev</span>
+    <span class="badge">Socket.IO</span>
+    <span class="badge">10+ Yrs Finance</span>
+  </div>
+  <div class="doc-label">Professional Portfolio · August 2026</div>
+</section>
+
+<!-- ═══════════════ TABLE OF CONTENTS ═══════════════ -->
+<section class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#summary">Professional Summary</a><span class="dots"></span></li>
+    <li><a href="#about">About Me</a><span class="dots"></span></li>
+    <li><a href="#stats">Portfolio Highlights</a><span class="dots"></span></li>
+    <li><a href="#skills">Skills</a><span class="dots"></span></li>
+    <li><a href="#experience">Experience</a><span class="dots"></span></li>
+    <li><a href="#projects">Projects Overview</a><span class="dots"></span></li>
+    <li><a href="#project-details">Project Details</a><span class="dots"></span></li>
+    <li><a href="#technologies">Technologies</a><span class="dots"></span></li>
+    <li><a href="#certifications">Certifications</a><span class="dots"></span></li>
+    <li><a href="#achievements">Achievements</a><span class="dots"></span></li>
+    <li><a href="#education">Education</a><span class="dots"></span></li>
+    <li><a href="#github">GitHub Profile</a><span class="dots"></span></li>
+    <li><a href="#resume">Resume Information</a><span class="dots"></span></li>
+    <li><a href="#contact">Contact &amp; Social Links</a><span class="dots"></span></li>
+  </ol>
+</section>
+
+<!-- ═══════════════ PROFESSIONAL SUMMARY ═══════════════ -->
+<section class="page" id="summary">
+  <div class="eyebrow">Overview</div>
+  <h2 class="section-title">Professional Summary</h2>
+  <p class="lead">
+    Full Stack Web Developer with hands-on MERN expertise (MongoDB, Express.js, React.js, Node.js)
+    and a growing specialization in AI-augmented development — integrating tools such as Antigravity,
+    OpenAI Codex, Qwen, and OpenCode into real production workflows. Currently an intern at Bano Qabil
+    Incubation Center, building BQ-PLAY, a live cricket scoring platform with real-time updates.
+  </p>
+  <p class="lead">
+    A complementary 10+ year background in Accounting &amp; Finance — including receivable management
+    supervision at AK Electronics — brings analytical rigor, structured problem-solving, and financial
+    reporting discipline to every engineering decision.
+  </p>
+</section>
+
+<!-- ═══════════════ ABOUT ME ═══════════════ -->
+<section class="page page-break" id="about">
+  <div class="eyebrow">Background</div>
+  <h2 class="section-title">About Me</h2>
+  <div class="two-col">
+    <div style="flex: 0 0 180px;">
+      <img class="about-photo" src="images/profile.jpg" alt="Portrait of Abid Ali Tanoli" />
+    </div>
+    <div>
+      <p>I'm a Full Stack Web Developer with hands-on MERN expertise — MongoDB, Express.js, React.js, and Node.js — and a fast-growing specialization in AI-augmented development. I integrate modern AI coding tools (Antigravity, OpenAI Codex, Qwen, OpenCode) directly into my workflow to design, build, and debug features faster without compromising quality.</p>
+      <p>I'm currently an intern at Bano Qabil Incubation Center, where I'm building BQ-PLAY — a live cricket scoring platform with real-time updates, an admin scoring console, and player statistics. I work in an agile team with Git/GitHub, design REST APIs and MongoDB schemas, and ship responsive React frontends end-to-end.</p>
+      <p>What sets me apart: 8+ years of professional experience in Accounting &amp; Finance. I've built financial MIS dashboards, managed receivables across South Pakistan, and filed tax reports — so I bring analytical rigor, structured problem-solving, and a business mindset to every engineering decision.</p>
+    </div>
+  </div>
+  <h3 class="sub-title">Where I'm Headed</h3>
+  <p>I'm on a trajectory from full stack development to AI-augmented engineering: building tools that combine the MERN stack with AI agents, prompt-driven workflows, and real-time systems — while keeping the financial discipline and analytical rigor I've carried from a decade in accounting.</p>
+</section>
+
+<!-- ═══════════════ STATS ═══════════════ -->
+<section class="page" id="stats">
+  <div class="eyebrow">At a Glance</div>
+  <h2 class="section-title">Portfolio Highlights</h2>
+  <div class="stats-row">
+    <div class="stat-box"><div class="num">8</div><div class="lbl">Projects Built</div></div>
+    <div class="stat-box"><div class="num">30+</div><div class="lbl">Technologies</div></div>
+    <div class="stat-box"><div class="num">12+</div><div class="lbl">Years Professional</div></div>
+    <div class="stat-box"><div class="num">13</div><div class="lbl">GitHub Repositories</div></div>
+    <div class="stat-box"><div class="num">5</div><div class="lbl">Certifications</div></div>
+  </div>
+</section>
+
+<!-- ═══════════════ SKILLS ═══════════════ -->
+<section class="page page-break" id="skills">
+  <div class="eyebrow">Expertise</div>
+  <h2 class="section-title">Skills</h2>
+
+  <div class="skill-group">
+    <div class="sg-title">Frontend</div>
+    <div class="sg-desc">Building responsive, accessible interfaces</div>
+    <div class="pills">
+      <span class="pill">HTML5 &amp; CSS3</span><span class="pill">JavaScript (ES6+)</span><span class="pill">React.js</span>
+      <span class="pill">React Hooks &amp; Context API</span><span class="pill">Tailwind CSS</span><span class="pill">Responsive / Mobile-First Design</span>
+    </div>
+  </div>
+  <div class="skill-group">
+    <div class="sg-title">Backend &amp; Database</div>
+    <div class="sg-desc">APIs, auth, and data modeling</div>
+    <div class="pills">
+      <span class="pill">Node.js</span><span class="pill">Express.js</span><span class="pill">MongoDB &amp; Mongoose</span>
+      <span class="pill">JWT / Session Auth</span><span class="pill">REST API Design</span><span class="pill">Third-Party Integrations</span><span class="pill">Socket.IO</span>
+    </div>
+  </div>
+  <div class="skill-group">
+    <div class="sg-title">AI-Augmented Development</div>
+    <div class="sg-desc">Shipping faster with AI agents in the loop</div>
+    <div class="pills">
+      <span class="pill">Antigravity</span><span class="pill">OpenAI Codex</span><span class="pill">Qwen</span>
+      <span class="pill">OpenCode</span><span class="pill">Prompt Engineering</span><span class="pill">AI Agent Workflows</span>
+    </div>
+  </div>
+  <div class="skill-group">
+    <div class="sg-title">Deployment &amp; DevOps</div>
+    <div class="sg-desc">From localhost to production</div>
+    <div class="pills">
+      <span class="pill">Vercel</span><span class="pill">Railway</span><span class="pill">GitHub Actions</span>
+      <span class="pill">Environment Management</span><span class="pill">Serverless Patterns</span>
+    </div>
+  </div>
+  <div class="skill-group">
+    <div class="sg-title">Tools &amp; Workflow</div>
+    <div class="sg-desc">The daily toolkit</div>
+    <div class="pills">
+      <span class="pill">Git &amp; GitHub</span><span class="pill">VS Code</span><span class="pill">Postman</span>
+      <span class="pill">npm</span><span class="pill">Agile Collaboration</span><span class="pill">Playwright</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ EXPERIENCE ═══════════════ -->
+<section class="page page-break" id="experience">
+  <div class="eyebrow">Career</div>
+  <h2 class="section-title">Experience</h2>
+
+  <div class="entry">
+    <div class="entry-head">
+      <span><span class="role">Full Stack Web Development Intern</span> — <span class="org">Bano Qabil Incubation Center</span></span>
+      <span class="period">Apr 2025 – Present</span>
+    </div>
+    <p class="summary">Building production MERN applications in an agile team — from schema design to deployment.</p>
+    <ul>
+      <li>Built and deployed BQ-PLAY, a live cricket scoring platform with real-time updates (MERN + Socket.IO)</li>
+      <li>Designing REST APIs and MongoDB schemas for a 20+ route, 22-model backend</li>
+      <li>Integrating AI coding tools (Antigravity, Codex, Qwen, OpenCode) into daily workflows</li>
+      <li>Shipping responsive React frontends and collaborating via Git/GitHub in agile sprints</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-head">
+      <span><span class="role">Accountant | Receivable Management Supervision</span> — <span class="org">AK Electronics</span></span>
+      <span class="period">Nov 2018 – Present</span>
+    </div>
+    <p class="summary">Own full-cycle accounting and supervise receivable management — analytical rigor applied daily.</p>
+    <ul>
+      <li>Supervise receivable management, client reconciliation, and collection follow-up</li>
+      <li>Prepare daily cash flow reports, general ledgers, and tax compliance filings</li>
+      <li>Manage monthly balance reconciliations and client account management</li>
+      <li>Build financial MIS reports and dashboards for senior management decision-making</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-head">
+      <span><span class="role">Receivable Management Supervisor</span> — <span class="org">Digicom QMobile (Pvt) Ltd</span></span>
+      <span class="period">Mar 2014 – Nov 2017</span>
+    </div>
+    <p class="summary">Led receivables reconciliation across South Pakistan — large-scale data accuracy under deadlines.</p>
+    <ul>
+      <li>Reconciled receivables across South Pakistan; produced DBC reports and sales-vs-return analysis</li>
+      <li>Maintained Oracle ERP updates; built MIS reports and financial dashboards</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-head">
+      <span><span class="role">Data Compilation Officer</span> — <span class="org">Engro Fertilizers (Rahbar Project)</span></span>
+      <span class="period">Apr 2018 – Jul 2018</span>
+    </div>
+    <p class="summary">Ensured data integrity for a farmer-verification program.</p>
+    <ul>
+      <li>Verified farmer documents and land status records</li>
+      <li>Maintained data integrity and compliance across the program database</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ PROJECTS OVERVIEW ═══════════════ -->
+<section class="page page-break" id="projects">
+  <div class="eyebrow">Work</div>
+  <h2 class="section-title">Projects Overview</h2>
+
+  <div class="project-card featured">
+    <div class="pc-head">
+      <div>
+        <div class="pc-name">BQ-PLAY (CricAll) <span class="status-badge status-live">Live</span></div>
+        <div class="pc-tagline">Live cricket scoring &amp; tournament platform</div>
+      </div>
+    </div>
+    <p>Flagship full-stack project — real-time cricket scoring with public user app, admin scoring console, and Socket.IO backend. AI commentary via Anthropic Claude.</p>
+    <div class="links-row"><a href="https://github.com/Abid-Tanoli/BQ-PLAY">GitHub →</a></div>
+  </div>
+
+  <div class="project-card featured">
+    <div class="pc-head">
+      <div>
+        <div class="pc-name">LowPriceMart <span class="status-badge status-progress">In Progress</span></div>
+        <div class="pc-tagline">Full-stack e-commerce platform</div>
+      </div>
+    </div>
+    <p>Three-tier e-commerce: customer storefront, admin dashboard with Recharts analytics, JWT auth, Cloudinary uploads, Playwright e2e suite.</p>
+    <div class="links-row"><a href="https://github.com/Abid-Tanoli/LowPriceMart">GitHub →</a></div>
+  </div>
+
+  <div class="project-card featured">
+    <div class="pc-head">
+      <div>
+        <div class="pc-name">Event Organizer <span class="status-badge status-verify">Needs Verification</span></div>
+        <div class="pc-tagline">Event booking &amp; management platform (TypeScript)</div>
+      </div>
+    </div>
+    <p>Full-stack TypeScript platform with JWT auth, event/category modules, and Vercel serverless-ready API.</p>
+    <div class="links-row">
+      <a href="https://github.com/Abid-Tanoli/Event-Organizer">GitHub →</a>
+      <a href="https://eventorganizer-five.vercel.app">Live Demo →</a>
+    </div>
+  </div>
+
+  <div class="project-card">
+    <div class="pc-name">Tourist Places Guide <span class="status-badge status-progress">In Progress</span></div>
+    <div class="pc-tagline">MERN travel guide with user &amp; admin apps</div>
+    <div class="links-row"><a href="https://github.com/Abid-Tanoli/tourist-places-guide">GitHub →</a></div>
+  </div>
+
+  <div class="project-card">
+    <div class="pc-name">ECommerce (Learning) <span class="status-badge status-archived">Archived</span></div>
+    <div class="pc-tagline">Self-learning e-commerce build — foundation for LowPriceMart</div>
+    <div class="links-row"><a href="https://github.com/Abid-Tanoli/ECommerce">GitHub →</a></div>
+  </div>
+
+  <div class="project-card">
+    <div class="pc-name">Web-3 Bano Qabil Backend <span class="status-badge status-archived">Archived</span></div>
+    <div class="pc-tagline">Backend coursework — Node.js, Express, MongoDB in TypeScript</div>
+    <div class="links-row"><a href="https://github.com/Abid-Tanoli/Web-3-Bano-Qabil-Backend">GitHub →</a></div>
+  </div>
+
+  <div class="project-card">
+    <div class="pc-name">Web-2 Bano Qabil <span class="status-badge status-archived">Archived</span></div>
+    <div class="pc-tagline">JavaScript fundamentals &amp; assignments</div>
+    <div class="links-row"><a href="https://github.com/Abid-Tanoli/Web-2-Bano-Qabil">GitHub →</a></div>
+  </div>
+
+  <div class="project-card">
+    <div class="pc-name">Web Dev 1 — Final &amp; Mid-Term <span class="status-badge status-archived">Archived</span></div>
+    <div class="pc-tagline">Bano Qabil web development coursework — HTML/CSS foundations</div>
+    <div class="links-row">
+      <a href="https://github.com/Abid-Tanoli/Final-Project-Web-dev-1">Final Project →</a>
+      <a href="https://github.com/Abid-Tanoli/Mid-Term_Web-dev-1">Mid-Term →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PROJECT DETAILS ═══════════════ -->
+<section class="page page-break" id="project-details">
+  <div class="eyebrow">Deep Dive</div>
+  <h2 class="section-title">Project Details</h2>
+
+  <div class="project-detail">
+    <h3 class="sub-title">BQ-PLAY (CricAll) — Live Cricket Scoring Platform</h3>
+    <img class="project-screenshot" src="../Frontend/User/public/og-image.png" alt="Portfolio preview — BQ-PLAY and MERN projects" />
+    <p>My flagship full-stack project at Bano Qabil Incubation Center. A live cricket scoring and tournament platform with a public user app (match center, live scores, rankings, points tables, news, videos), a dedicated admin scoring console (ball-by-ball scoring, wagon wheel, pitch maps, DRS review, super-over and tie resolution), and a Node/Express + Socket.IO backend.</p>
+    <p><b>Key Features:</b></p>
+    <ul>
+      <li>Real-time score updates via Socket.IO (WebSocket) across user and admin apps</li>
+      <li>Ball-by-ball live scoring console with full match setup wizard (format, XI, toss, openers)</li>
+      <li>AI-powered commentary generation through Anthropic Claude</li>
+      <li>Match detail pages: Live, Scorecard, Commentary, Partnerships, Graphs, Info tabs</li>
+      <li>Series/tournaments, team &amp; player profiles, rankings and points tables</li>
+      <li>22 MongoDB models and 20+ REST route groups on the backend</li>
+      <li>Dark/light theme toggle in both frontends</li>
+    </ul>
+    <p><b>Tech Stack:</b> React, Redux Toolkit, React Query, Socket.IO, Node.js, Express, MongoDB, Tailwind CSS, Anthropic Claude API</p>
+    <div class="links-row"><a href="https://github.com/Abid-Tanoli/BQ-PLAY">View Source on GitHub →</a></div>
+  </div>
+
+  <div class="project-detail">
+    <h3 class="sub-title">LowPriceMart — Full-Stack E-Commerce</h3>
+    <p>A complete three-tier e-commerce application: a customer storefront, a separate admin dashboard with sales analytics (Recharts), and a Node.js/Express backend with MongoDB. Authentication via JWT, image uploads via Cloudinary, transactional emails via Nodemailer, and Zod validation on every input — plus an end-to-end Playwright test suite.</p>
+    <ul>
+      <li>Separate user and admin React frontends with Redux Toolkit state management</li>
+      <li>Admin analytics dashboard with charts (Recharts)</li>
+      <li>JWT authentication, Cloudinary image uploads, Nodemailer email flows</li>
+      <li>Zod validation across the full stack</li>
+      <li>Playwright end-to-end test suite</li>
+    </ul>
+    <p><b>Tech Stack:</b> React, Vite, Tailwind CSS, shadcn/ui, Redux Toolkit, Recharts, Node.js, Express, MongoDB, JWT, Cloudinary, Nodemailer, Zod, Playwright</p>
+    <div class="links-row"><a href="https://github.com/Abid-Tanoli/LowPriceMart">View Source on GitHub →</a></div>
+  </div>
+
+  <div class="project-detail">
+    <h3 class="sub-title">Event Organizer — Event Booking &amp; Management Platform</h3>
+    <p>A full-stack event booking and management platform built with React, TypeScript, Node.js, Express, and MongoDB. Feature modules for authentication, users, admins, events, and categories with JWT auth, a Vercel serverless entry point for the API, and a clean layered project structure.</p>
+    <ul>
+      <li>Auth module: register, login, JWT sessions</li>
+      <li>User, admin, event, and category management modules</li>
+      <li>TypeScript across backend and frontend</li>
+      <li>Vercel serverless-ready API entry point</li>
+    </ul>
+    <p><b>Tech Stack:</b> React, TypeScript, Node.js, Express, MongoDB, JWT, Vercel</p>
+    <div class="links-row">
+      <a href="https://github.com/Abid-Tanoli/Event-Organizer">GitHub →</a>
+      <a href="https://eventorganizer-five.vercel.app">Live Demo →</a>
+    </div>
+  </div>
+
+  <div class="project-detail">
+    <h3 class="sub-title">Tourist Places Guide — MERN Travel Guide</h3>
+    <p>A MERN-stack tourist places guide with separate user and admin React (Vite) frontends connected to a Node.js, Express.js, MongoDB, and Mongoose backend. Covers full CRUD flows for places and categories with environment-based configuration.</p>
+    <p><b>Tech Stack:</b> React, Vite, Node.js, Express, MongoDB, Mongoose</p>
+    <div class="links-row"><a href="https://github.com/Abid-Tanoli/tourist-places-guide">View Source on GitHub →</a></div>
+  </div>
+</section>
+
+<!-- ═══════════════ TECHNOLOGIES ═══════════════ -->
+<section class="page page-break" id="technologies">
+  <div class="eyebrow">Stack</div>
+  <h2 class="section-title">Technologies</h2>
+  <p>Technologies used across portfolio projects and professional workflows:</p>
+  <div class="tech-cloud">
+    <span class="tech-tag">React</span><span class="tech-tag">TypeScript</span><span class="tech-tag">JavaScript</span>
+    <span class="tech-tag">Node.js</span><span class="tech-tag">Express.js</span><span class="tech-tag">MongoDB</span>
+    <span class="tech-tag">Mongoose</span><span class="tech-tag">Socket.IO</span><span class="tech-tag">Redux Toolkit</span>
+    <span class="tech-tag">React Query</span><span class="tech-tag">Tailwind CSS</span><span class="tech-tag">shadcn/ui</span>
+    <span class="tech-tag">Vite</span><span class="tech-tag">JWT</span><span class="tech-tag">REST APIs</span>
+    <span class="tech-tag">Cloudinary</span><span class="tech-tag">Nodemailer</span><span class="tech-tag">Zod</span>
+    <span class="tech-tag">Playwright</span><span class="tech-tag">Recharts</span><span class="tech-tag">Anthropic Claude API</span>
+    <span class="tech-tag">Vercel</span><span class="tech-tag">Railway</span><span class="tech-tag">GitHub Actions</span>
+    <span class="tech-tag">Git &amp; GitHub</span><span class="tech-tag">Postman</span><span class="tech-tag">HTML5</span>
+    <span class="tech-tag">CSS3</span><span class="tech-tag">Oracle ERP</span><span class="tech-tag">Antigravity</span>
+    <span class="tech-tag">OpenAI Codex</span><span class="tech-tag">Qwen</span><span class="tech-tag">OpenCode</span>
+  </div>
+
+  <h3 class="sub-title" style="margin-top: 20px;">Language Distribution (GitHub Repositories)</h3>
+  <div class="lang-bar">
+    <div class="lang-seg" style="width:45%;background:#f1e05a;" title="JavaScript"></div>
+    <div class="lang-seg" style="width:25%;background:#3178c6;" title="TypeScript"></div>
+    <div class="lang-seg" style="width:15%;background:#663399;" title="CSS"></div>
+    <div class="lang-seg" style="width:10%;background:#e34c26;" title="HTML"></div>
+    <div class="lang-seg" style="width:5%;background:#9ca3af;" title="Other"></div>
+  </div>
+  <div class="lang-legend">
+    <span>■ JavaScript 45%</span><span>■ TypeScript 25%</span><span>■ CSS 15%</span><span>■ HTML 10%</span><span>■ Other 5%</span>
+  </div>
+</section>
+
+<!-- ═══════════════ CERTIFICATIONS ═══════════════ -->
+<section class="page page-break" id="certifications">
+  <div class="eyebrow">Credentials</div>
+  <h2 class="section-title">Certifications</h2>
+  <div class="cert-grid">
+    <div class="cert-item">
+      <div class="ci-title">Backend Development — Node.js, MongoDB, Express.js</div>
+      <div class="ci-issuer">Bano Qabil 4.0 · Fall</div>
+    </div>
+    <div class="cert-item">
+      <div class="ci-title">React.js Course</div>
+      <div class="ci-issuer">Bano Qabil 4.0</div>
+    </div>
+    <div class="cert-item">
+      <div class="ci-title">Web Development — HTML, CSS, JavaScript</div>
+      <div class="ci-issuer">Bano Qabil 3.0</div>
+    </div>
+    <div class="cert-item">
+      <div class="ci-title">Computerized Accounting</div>
+      <div class="ci-issuer">Sindh Board of Technical Education · A+ Grade</div>
+    </div>
+    <div class="cert-item">
+      <div class="ci-title">Intermediate (Pre-Medical)</div>
+      <div class="ci-issuer">Crescent Degree College, Karachi · Completed</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ACHIEVEMENTS ═══════════════ -->
+<section class="page" id="achievements">
+  <div class="eyebrow">Milestones</div>
+  <h2 class="section-title">Achievements</h2>
+  <div class="cert-grid">
+    <div class="ach-item">
+      <div class="ai-title">Shipped a real-time live-scoring platform end-to-end</div>
+      <div class="ai-detail">BQ-PLAY: MERN + Socket.IO, 25-page user app, 20-page admin console, 22 models, AI commentary integration.</div>
+    </div>
+    <div class="ach-item">
+      <div class="ai-title">3 Bano Qabil technical certifications</div>
+      <div class="ai-detail">Backend (Node/Mongo/Express), React.js, and Web Development fundamentals.</div>
+    </div>
+    <div class="ach-item">
+      <div class="ai-title">10+ years of professional financial &amp; analytical experience</div>
+      <div class="ai-detail">From receivable management across South Pakistan to full-cycle accounting and receivable supervision at AK Electronics.</div>
+    </div>
+    <div class="ach-item">
+      <div class="ai-title">Pioneering AI-augmented workflows</div>
+      <div class="ai-detail">Integrated Antigravity, Codex, Qwen, and OpenCode into real project workflows.</div>
+    </div>
+    <div class="ach-item">
+      <div class="ai-title">Tested production apps with Playwright</div>
+      <div class="ai-detail">End-to-end test suites written for full-stack applications.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ EDUCATION ═══════════════ -->
+<section class="page page-break" id="education">
+  <div class="eyebrow">Academics</div>
+  <h2 class="section-title">Education</h2>
+  <div class="entry">
+    <div class="entry-head">
+      <span><span class="org">B.Com (Bachelor of Commerce)</span> — University of Karachi</span>
+      <span class="period">In Progress</span>
+    </div>
+    <p class="summary">Continuing part-time alongside full-time engineering work.</p>
+  </div>
+  <div class="entry">
+    <div class="entry-head">
+      <span><span class="org">Intermediate (Pre-Medical)</span> — Crescent Degree College, Karachi</span>
+      <span class="period">Completed</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ GITHUB ═══════════════ -->
+<section class="page page-break" id="github">
+  <div class="eyebrow">Open Source</div>
+  <h2 class="section-title">GitHub Profile</h2>
+  <p>Active GitHub developer since June 2024 with 13 public repositories spanning full-stack MERN applications, TypeScript backends, and coursework.</p>
+  <div class="gh-stats">
+    <div class="gh-stat"><div class="gs-num">13</div><div class="gs-lbl">Public Repos</div></div>
+    <div class="gh-stat"><div class="gs-num">1</div><div class="gs-lbl">Followers</div></div>
+    <div class="gh-stat"><div class="gs-num">2</div><div class="gs-lbl">Following</div></div>
+    <div class="gh-stat"><div class="gs-num">1</div><div class="gs-lbl">Total Stars</div></div>
+  </div>
+  <h3 class="sub-title">Top Repositories</h3>
+  <div class="repo-list">
+    <div class="repo-item"><span class="rn">BQ-PLAY</span><span>JavaScript · Live cricket scoring platform</span></div>
+    <div class="repo-item"><span class="rn">LowPriceMart</span><span>JavaScript · Full-stack e-commerce</span></div>
+    <div class="repo-item"><span class="rn">Event-Organizer</span><span>TypeScript · Event booking platform</span></div>
+    <div class="repo-item"><span class="rn">portfolio</span><span>TypeScript · This portfolio site</span></div>
+    <div class="repo-item"><span class="rn">Web-3-Bano-Qabil-Backend</span><span>TypeScript · Backend coursework</span></div>
+    <div class="repo-item"><span class="rn">tourist-places-guide</span><span>JavaScript · MERN travel guide</span></div>
+  </div>
+  <div class="links-row" style="margin-top: 14px;">
+    <a href="https://github.com/Abid-Tanoli">View Full GitHub Profile →</a>
+  </div>
+</section>
+
+<!-- ═══════════════ RESUME INFO ═══════════════ -->
+<section class="page page-break" id="resume">
+  <div class="eyebrow">CV</div>
+  <h2 class="section-title">Resume Information</h2>
+  <div class="resume-box">
+    <p><b>Format:</b> ATS-friendly, single-column resume optimized for recruiters and applicant tracking systems.</p>
+    <p><b>Current Title:</b> Full Stack Web Developer (MERN) | AI-Augmented Development | Accountant &amp; Receivable Management</p>
+    <p><b>Current Role at AK Electronics:</b> Accountant | Receivable Management Supervision (Nov 2018 – Present)</p>
+    <p><b>Includes:</b> Professional summary, skills, experience (tech + finance), featured projects, education, and certifications.</p>
+    <p style="margin-bottom:0;"><b>Availability:</b> Open to freelance work, collaborations, and full-time engineering roles. Based in Karachi, Pakistan — available for remote and hybrid opportunities.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CONTACT ═══════════════ -->
+<section class="page page-break" id="contact">
+  <div class="eyebrow">Get in Touch</div>
+  <h2 class="section-title">Contact &amp; Social Links</h2>
+  <p>Freelance work, collaborations, or engineering conversations — the inbox is open.</p>
+  <div class="contact-grid">
+    <div class="contact-item">
+      <div class="cl-label">Email</div>
+      <div class="cl-value"><a href="mailto:visionaryabidi@gmail.com">visionaryabidi@gmail.com</a></div>
+    </div>
+    <div class="contact-item">
+      <div class="cl-label">Phone</div>
+      <div class="cl-value"><a href="tel:+923323178928">+92 332 3178928</a></div>
+    </div>
+    <div class="contact-item">
+      <div class="cl-label">Location</div>
+      <div class="cl-value">Karachi, Pakistan</div>
+    </div>
+    <div class="contact-item">
+      <div class="cl-label">GitHub</div>
+      <div class="cl-value"><a href="https://github.com/Abid-Tanoli">github.com/Abid-Tanoli</a></div>
+    </div>
+    <div class="contact-item">
+      <div class="cl-label">LinkedIn</div>
+      <div class="cl-value" style="color:#6b7280;font-weight:400;">Profile URL coming soon</div>
+    </div>
+    <div class="contact-item">
+      <div class="cl-label">Portfolio Website</div>
+      <div class="cl-value">Full interactive portfolio with live GitHub stats, project pages, and contact form</div>
+    </div>
+  </div>
+  <div class="footer-note">
+    Abid Ali Tanoli · Full Stack Web Developer (MERN) · Professional Portfolio · Generated August 2026<br />
+    All project descriptions and experience details verified against portfolio source data and GitHub repositories.
+  </div>
+</section>
+
+</body>
+</html>

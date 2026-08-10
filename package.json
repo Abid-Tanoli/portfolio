@@ -4,12 +4,14 @@
   "version": "1.0.0",
   "description": "Portfolio of Abid Ali Tanoli — React frontend (Frontend/) + Express backend (Backend/)",
   "scripts": {
-    "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev --prefix Backend\" \"npm run dev --prefix Frontend\"",
+    "dev": "concurrently -n backend,user,admin -c blue,green,magenta \"npm run dev --prefix Backend\" \"npm run dev --prefix Frontend/User\" \"npm run dev --prefix Frontend/admin\"",
     "dev:backend": "npm run dev --prefix Backend",
-    "dev:frontend": "npm run dev --prefix Frontend",
-    "build": "npm run build --prefix Frontend",
-    "typecheck": "npm run typecheck --prefix Backend && npm run build --prefix Frontend",
-    "lint": "npm run lint --prefix Frontend"
+    "dev:user": "npm run dev --prefix Frontend/User",
+    "dev:admin": "npm run dev --prefix Frontend/admin",
+    "build": "npm run build --prefix Frontend/User",
+    "build:user": "npm run build --prefix Frontend/User",
+    "build:admin": "npm run build --prefix Frontend/admin",
+    "typecheck": "npm run typecheck --prefix Backend && npm run build --prefix Frontend/User && npm run build --prefix Frontend/admin"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

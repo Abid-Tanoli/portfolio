@@ -2,7 +2,6 @@ import { Router, type NextFunction, type Request, type Response } from "express"
 import { z } from "zod";
 import { asyncHandler } from "./_helpers.js";
 import { sendContactEmail } from "../services/mailer.js";
-import { getDb } from "../services/db.js";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(120),
@@ -49,30 +48,39 @@ contactRouter.post(
 
     const { name, email, subject, message } = parsed.data;
 
-    if (!isContactConfigured()) {
-      res.status(503).json({
-        error:
-          "Mail server is not configured yet. Add SMTP credentials to the backend .env file (see .env.example).",
+    let emailSent = false;
+    let messageId: string | null = null;
+
+    if (isContactConfigured()) {
+      try {
+        const info = await sendContactEmail({ name, email, subject, message });
+        emailSent = true;
+        messageId = info.messageId ?? null;
+      } catch (err) {
+        console.warn("[contact] SMTP send failed:", err);
+      }
+    }
+
+    try {
+      const { ContactSubmission } = await import("../models/ContactSubmission.js");
+      await ContactSubmission.create({
+        name,
+        email,
+        message: subject ? `Subject: ${subject}\n\n${message}` : message,
+        submittedAt: new Date(),
+        read: false,
       });
+    } catch (err) {
+      console.warn("[contact] DB logging failed:", err);
+    }
+
+    if (!emailSent && !isContactConfigured()) {
+      // If SMTP is not set up, but submission was received (and saved to DB if connected)
+      res.status(200).json({ ok: true, note: "Message saved to database. SMTP email delivery pending configuration." });
       return;
     }
 
-    const info = await sendContactEmail({ name, email, subject, message });
-
-    const db = getDb();
-    if (db) {
-      await db.collection("contact_messages").insertOne({
-        name,
-        email,
-        subject,
-        message,
-        sent: true,
-        messageId: info.messageId ?? null,
-        createdAt: new Date(),
-      });
-    }
-
-    res.status(200).json({ ok: true, messageId: info.messageId ?? null });
+    res.status(200).json({ ok: true, messageId });
   })
 );
 

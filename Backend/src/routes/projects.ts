@@ -1,5 +1,7 @@
-﻿import { Router } from "express";
+import { Router, Request, Response } from "express";
+import { Project } from "../models/Project.js";
 import { getRepos, type RepoSummary } from "../services/githubService.js";
+import { requireAuth } from "../middleware/auth.middleware.js";
 import { asyncHandler } from "./_helpers.js";
 
 type ProjectStatus = "live" | "in-progress" | "archived" | "verify";
@@ -25,9 +27,11 @@ interface CuratedProject {
   startedAt: string;
   isFeatured: boolean;
   repoNames: string[];
+  screenshotUrls?: string[];
+  order?: number;
 }
 
-const curatedProjects: CuratedProject[] = [
+const fallbackProjects: CuratedProject[] = [
   {
     slug: "bq-play",
     name: "BQ-PLAY (CricAll)",
@@ -49,6 +53,7 @@ const curatedProjects: CuratedProject[] = [
     startedAt: "2026-01-12",
     isFeatured: true,
     repoNames: ["BQ-PLAY"],
+    order: 0,
   },
   {
     slug: "lowpricemart",
@@ -71,6 +76,7 @@ const curatedProjects: CuratedProject[] = [
     startedAt: "2025-12-04",
     isFeatured: true,
     repoNames: ["LowPriceMart"],
+    order: 1,
   },
   {
     slug: "event-organizer",
@@ -93,6 +99,7 @@ const curatedProjects: CuratedProject[] = [
     startedAt: "2026-02-03",
     isFeatured: true,
     repoNames: ["Event-Organizer"],
+    order: 2,
   },
   {
     slug: "tourist-places-guide",
@@ -110,6 +117,7 @@ const curatedProjects: CuratedProject[] = [
     startedAt: "2026-07-09",
     isFeatured: false,
     repoNames: ["tourist-places-guide"],
+    order: 3,
   },
   {
     slug: "ecommerce",
@@ -125,6 +133,7 @@ const curatedProjects: CuratedProject[] = [
     startedAt: "2025-11-04",
     isFeatured: false,
     repoNames: ["ECommerce"],
+    order: 4,
   },
   {
     slug: "web-3-backend",
@@ -140,6 +149,7 @@ const curatedProjects: CuratedProject[] = [
     startedAt: "2025-11-21",
     isFeatured: false,
     repoNames: ["Web-3-Bano-Qabil-Backend"],
+    order: 5,
   },
   {
     slug: "web-2-assignments",
@@ -155,6 +165,7 @@ const curatedProjects: CuratedProject[] = [
     startedAt: "2025-07-21",
     isFeatured: false,
     repoNames: ["Web-2-Bano-Qabil"],
+    order: 6,
   },
   {
     slug: "web-dev-1-projects",
@@ -174,29 +185,33 @@ const curatedProjects: CuratedProject[] = [
     startedAt: "2024-08-20",
     isFeatured: false,
     repoNames: ["Final-Project-Web-dev-1", "Mid-Term_Web-dev-1", "assigment"],
+    order: 7,
   },
 ];
 
-function findRepo(project: CuratedProject, repos: RepoSummary[]) {
+function findRepo(repoNames: string[], repos: RepoSummary[]) {
   const byName = new Map(repos.map((repo) => [repo.name.toLowerCase(), repo]));
-  return project.repoNames.map((name) => byName.get(name.toLowerCase())).find(Boolean);
+  return repoNames.map((name) => byName.get(name.toLowerCase())).find(Boolean);
 }
 
-function toPublicProject(project: CuratedProject, repo?: RepoSummary) {
+function toPublicProject(project: any, repo?: RepoSummary) {
   return {
+    id: project._id || project.slug,
     slug: project.slug,
     name: project.name,
     tagline: project.tagline,
     description: project.description,
-    features: project.features,
-    stack: project.stack,
+    features: project.features || [],
+    stack: project.stack || [],
     category: project.category,
     status: project.status,
     statusNote: project.statusNote,
     repoUrl: project.repoUrl,
-    links: project.links,
+    links: project.links || [],
     startedAt: project.startedAt,
-    isFeatured: project.isFeatured,
+    isFeatured: Boolean(project.isFeatured),
+    screenshotUrls: project.screenshotUrls || [],
+    order: project.order ?? 0,
     language: repo?.language ?? null,
     stars: repo?.stars ?? 0,
     forks: repo?.forks ?? 0,
@@ -207,11 +222,22 @@ function toPublicProject(project: CuratedProject, repo?: RepoSummary) {
 
 export const projectsRouter = Router();
 
+// GET /api/projects (Public list)
 projectsRouter.get(
   "/",
-  asyncHandler(async (_req, res) => {
-    let repos: RepoSummary[] = [];
+  asyncHandler(async (_req: Request, res: Response) => {
+    let rawProjects: any[] = [];
+    try {
+      rawProjects = await Project.find().sort({ order: 1, createdAt: -1 }).lean();
+    } catch (e) {
+      console.warn("[projects] Error fetching projects from MongoDB, using fallback array");
+    }
 
+    if (rawProjects.length === 0) {
+      rawProjects = fallbackProjects;
+    }
+
+    let repos: RepoSummary[] = [];
     try {
       repos = await getRepos();
     } catch (err) {
@@ -219,7 +245,93 @@ projectsRouter.get(
       console.warn(`[portfolio-api] GitHub enrichment unavailable for /api/projects: ${message}`);
     }
 
-    const projects = curatedProjects.map((project) => toPublicProject(project, findRepo(project, repos)));
-    res.json({ source: repos.length > 0 ? "github+curated" : "curated", projects });
+    const projects = rawProjects.map((project) =>
+      toPublicProject(project, findRepo(project.repoNames || [project.name], repos))
+    );
+    res.json({ source: repos.length > 0 ? "github+database" : "database", projects });
+  })
+);
+
+// GET /api/projects/:slug (Public single)
+projectsRouter.get(
+  "/:slug",
+  asyncHandler(async (req: Request, res: Response) => {
+    const { slug } = req.params;
+    let project = await Project.findOne({ slug }).lean();
+
+    if (!project) {
+      const fallback = fallbackProjects.find((p) => p.slug === slug);
+      if (!fallback) {
+        res.status(404).json({ error: "Project not found" });
+        return;
+      }
+      project = fallback as any;
+    }
+
+    let repos: RepoSummary[] = [];
+    try {
+      repos = await getRepos();
+    } catch (_) {}
+
+    res.json(toPublicProject(project, findRepo(project?.repoNames || [project?.name], repos)));
+  })
+);
+
+// POST /api/projects (Protected - Create)
+projectsRouter.post(
+  "/",
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const project = new Project(req.body);
+    await project.save();
+    res.status(201).json(project);
+  })
+);
+
+// PUT /api/projects/:id (Protected - Update)
+projectsRouter.put(
+  "/:id",
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    if (!project) {
+      res.status(404).json({ error: "Project not found" });
+      return;
+    }
+    res.json(project);
+  })
+);
+
+// DELETE /api/projects/:id (Protected - Delete)
+projectsRouter.delete(
+  "/:id",
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const project = await Project.findByIdAndDelete(req.params.id);
+    if (!project) {
+      res.status(404).json({ error: "Project not found" });
+      return;
+    }
+    res.json({ message: "Project deleted successfully" });
+  })
+);
+
+// PATCH /api/projects/reorder (Protected - Reorder)
+projectsRouter.patch(
+  "/reorder",
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const { orders } = req.body; // Array of { id, order }
+    if (!Array.isArray(orders)) {
+      res.status(400).json({ error: "orders array is required" });
+      return;
+    }
+
+    const updates = orders.map((item: { id: string; order: number }) =>
+      Project.findByIdAndUpdate(item.id, { order: item.order })
+    );
+    await Promise.all(updates);
+
+    res.json({ message: "Projects reordered successfully" });
   })
 );

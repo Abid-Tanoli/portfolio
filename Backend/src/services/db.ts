@@ -1,5 +1,7 @@
 import { MongoClient } from "mongodb";
 
+import mongoose from "mongoose";
+
 let client: MongoClient | null = null;
 let connected = false;
 
@@ -49,6 +51,7 @@ async function connectMongo(connectionUri: string) {
       const c = new MongoClient(connectionUri, { serverSelectionTimeoutMS: 12000 });
       await c.connect();
       await c.db().command({ ping: 1 });
+      await mongoose.connect(connectionUri, { serverSelectionTimeoutMS: 12000 });
       return c;
     } catch (err) {
       lastErr = err;
@@ -67,7 +70,7 @@ export async function connectDb() {
   try {
     client = await connectMongo(uri);
     connected = true;
-    console.log("[portfolio-api] MongoDB connected (SRV)");
+    console.log("[portfolio-api] MongoDB + Mongoose connected (SRV)");
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("querySrv") || msg.includes("getaddrinfo") || msg.includes("ECONNREFUSED") || msg.includes("ENOTFOUND")) {
@@ -76,7 +79,7 @@ export async function connectDb() {
         const directUri = await resolveSrvViaDoH(uri);
         client = await connectMongo(directUri);
         connected = true;
-        console.log("[portfolio-api] MongoDB connected (DoH fallback)");
+        console.log("[portfolio-api] MongoDB + Mongoose connected (DoH fallback)");
       } catch (err2) {
         console.warn("[portfolio-api] MongoDB DoH fallback failed (continuing without db):", err2);
         client = null;
