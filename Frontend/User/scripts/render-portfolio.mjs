@@ -6,8 +6,7 @@ import puppeteer from "puppeteer-core";
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const contentDir = path.join(repoRoot, "content");
 const htmlPath = path.join(contentDir, "portfolio.html");
-const pdfRoot = path.join(repoRoot, "Portfolio.pdf");
-const pdfContent = path.join(contentDir, "portfolio.pdf");
+const pdfPath = path.join(contentDir, "portfolio.pdf");
 
 const EDGE_CANDIDATES = [
   "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
@@ -49,9 +48,7 @@ const pdfOptions = {
   margin: { top: "18mm", bottom: "18mm", left: "0mm", right: "0mm" },
 };
 
-await page.pdf({ ...pdfOptions, path: pdfRoot });
-await page.pdf({ ...pdfOptions, path: pdfContent });
+await page.pdf({ ...pdfOptions, path: pdfPath });
 await browser.close();
 
-console.log(`Portfolio PDF written: ${pdfRoot}`);
-console.log(`Portfolio PDF copy:   ${pdfContent}`);
+console.log(`Portfolio PDF written: ${pdfPath}`);

@@ -15,15 +15,10 @@ if (existsSync(contentResume)) {
 }
 
 const contentPortfolio = join(contentDir, "portfolio.pdf");
-const publicPortfolio = join(publicDir, "portfolio.pdf");
-const rootPortfolio = join(repoRoot, "Portfolio.pdf");
+const publicPortfolio = join(publicDir, "Portfolio.pdf");
 if (existsSync(contentPortfolio)) {
   copyFileSync(contentPortfolio, publicPortfolio);
   console.log(`[copy-assets] copied ${contentPortfolio} -> ${publicPortfolio}`);
-}
-if (existsSync(rootPortfolio)) {
-  copyFileSync(rootPortfolio, join(publicDir, "Portfolio.pdf"));
-  console.log(`[copy-assets] copied ${rootPortfolio} -> ${join(publicDir, "Portfolio.pdf")}`);
 }
 
 const contentImages = join(contentDir, "images");

@@ -1,6 +1,15 @@
 # PROGRESS.md — Portfolio Project
 
-Repo: Portfolio · Branch: main · Updated: 2026-08-10
+Repo: Portfolio · Branch: main · Updated: 2026-08-12
+
+## Step 1 — CLEANUP
+- **Status:** DONE · 100% of step · **Overall: 17% (1/6)**
+- Removed 89 tracked legacy files under `Frontend/` (src/, public/, scripts/, index.html, package.json, tsconfig*, vercel.json, etc.) plus untracked `Frontend/dist`, `Frontend/node_modules`, `Frontend/public` — only `Frontend/User/` and `Frontend/admin/` remain.
+- Deleted 6 stray log files (3 in Backend, 3 in Frontend/User); `*.log` already gitignored in all 4 locations.
+- Removed duplicate root `Portfolio.pdf` — kept `content/portfolio.pdf`: both were outputs of `render-portfolio.mjs` rendering `content/portfolio.html`; only the `content/` file feeds `copy-assets.mjs` → `public/Portfolio.pdf`. Simplified both scripts to a single output path.
+- Verified `Backend/.env` is NOT tracked in git and remains in `.gitignore` (+ `Backend/.gitignore`).
+- Removed empty `mongo.md` (tracked, 0 bytes, no references).
+- Both dev servers verified starting cleanly after removal.
 
 ## Step A — SAFETY: Commit existing uncommitted work
 - **Status:** DONE · 100% of step · **Overall: 15%**
@@ -39,4 +48,4 @@ Repo: Portfolio · Branch: main · Updated: 2026-08-10
 - Need: Vercel (User + Admin) + Railway (Backend) access, CORS, responsive, Lighthouse, DEPLOYMENT.md URLs.
 
 ## Final
-- **Status:** PENDING · Overall: ~40%
+- **Status:** PENDING · Overall: 17%
