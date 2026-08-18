@@ -1,91 +1,79 @@
-﻿# Deployment Runbook
+# Deployment Runbook
 
-This portfolio uses the confirmed MERN-style architecture:
+This portfolio uses the modern MERN architecture split into 3 independent services:
 
-- `Frontend/`: React + Vite static app, deployed to Vercel.
-- `Backend/`: Node.js + Express API, deployed to Railway or another persistent Node host.
+1. **Frontend User App (`Frontend/User`)** — Public visitor portfolio (React + Vite + SSR/Prerender), deployed to Vercel.
+2. **Frontend Admin App (`Frontend/admin`)** — Dedicated CMS console (React + Vite + Tailwind + Lucide), deployed to Vercel.
+3. **Backend API (`Backend`)** — Persistent Node.js + Express + MongoDB service with Puppeteer PDF generation and Cloudinary CDN uploads, deployed to Railway.
 
-The backend stays separate because the contact API, GitHub cache, MongoDB logging, and future long-lived integrations are cleaner as a persistent Express service than as frontend-only static hosting.
+---
 
-## Local Development
+## 1. Backend Service (Railway / Render / VPS)
 
-1. Install dependencies from the repo root:
+### Build & Run Settings
+- **Root Directory**: `Backend`
+- **Build Command**: `npm run build` (runs `tsc`)
+- **Start Command**: `npm start` (runs `node dist/index.js`)
 
-   ```powershell
-   npm install
-   npm install --prefix Frontend
-   npm install --prefix Backend
-   ```
+### Required Production Environment Variables
+| Variable | Description |
+| :--- | :--- |
+| `PORT` | Provided automatically by Railway (defaults to 4000 locally) |
+| `MONGO_URI` | MongoDB Atlas connection string |
+| `JWT_SECRET` | Secret key for signing admin JWT sessions |
+| `ADMIN_INITIAL_EMAIL` | Initial admin account email (e.g. `visionaryabidi@gmail.com`) |
+| `ADMIN_INITIAL_PASSWORD` | Initial admin account password (synced on startup) |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name for image/PDF uploads |
+| `CLOUDINARY_API_KEY` | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
+| `CORS_ORIGINS` | Comma-separated allowed frontend origins (e.g. `https://abidtanoli.vercel.app,https://admin-abidtanoli.vercel.app`) |
+| `SMTP_HOST` | (Optional) SMTP host for contact email forwarding |
+| `SMTP_PORT` | (Optional) SMTP port |
+| `SMTP_USER` | (Optional) SMTP username |
+| `SMTP_PASS` | (Optional) SMTP password |
+| `CONTACT_TO` | Email address receiving contact messages |
 
-2. Copy env files:
-
-   ```powershell
-   Copy-Item Frontend\.env.example Frontend\.env
-   Copy-Item Backend\.env.example Backend\.env
-   ```
-
-3. Start both apps:
-
-   ```powershell
-   npm run dev
-   ```
-
-Vite runs on `http://localhost:5173` and proxies `/api` to the Express backend on `http://localhost:4000`.
-
-## Backend Deployment
-
-Deploy `Backend/` as a Node service.
-
-Required build/start commands:
-
-```powershell
-npm install
-npm run build
-npm start
-```
-
-Required environment variables:
-
-- `PORT`: provided by the host, or `4000` locally.
-- `CORS_ORIGINS`: comma-separated frontend origins, for example `https://your-portfolio.vercel.app`.
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`: contact form email transport.
-- `SMTP_FROM`, `CONTACT_TO`: optional sender/recipient overrides.
-- `MONGO_URI`: optional MongoDB connection string for storing contact messages.
-- `GITHUB_TOKEN`: optional GitHub token for higher rate limits.
-
-Health check:
-
+### Health Check Endpoint
 ```text
 GET /api/health
 ```
+Returns `{ status: "ok", db: "connected", uptime: ... }`.
 
-## Frontend Deployment
+---
 
-Deploy `Frontend/` to Vercel as a Vite project.
+## 2. Frontend User App (Vercel Project 1)
 
-Build command:
+### Build & Run Settings
+- **Root Directory**: `Frontend/User`
+- **Framework Preset**: Vite
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
 
-```powershell
-npm run build
-```
+### Environment Variables
+| Variable | Value |
+| :--- | :--- |
+| `VITE_API_URL` | Live backend API URL (e.g. `https://portfolio-backend-production-xxxx.up.railway.app`) |
+| `VITE_SITE_URL` | Live public site URL (e.g. `https://abidtanoli.vercel.app`) |
 
-Output directory:
+---
 
-```text
-dist
-```
+## 3. Frontend Admin App (Vercel Project 2)
 
-Required Vercel environment variables:
+### Build & Run Settings
+- **Root Directory**: `Frontend/admin`
+- **Framework Preset**: Vite
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
 
-- `VITE_API_URL`: production backend URL, for example `https://your-api.up.railway.app`.
-- `VITE_SITE_URL`: production frontend URL.
-- `VITE_RESUME_URL`: optional override; defaults to `/resume.pdf`.
+### Environment Variables
+| Variable | Value |
+| :--- | :--- |
+| `VITE_API_BASE_URL` | Live backend API base URL (e.g. `https://portfolio-backend-production-xxxx.up.railway.app/api`) |
 
-`Frontend/vercel.json` contains the SPA fallback rewrite for deep links.
+---
 
-## Current Blockers
-
-- LinkedIn URL is still pending.
-- Vercel login/token is needed to publish from this machine.
-- Railway access is needed to confirm the final backend service URL.
-- SMTP credentials are needed before the contact form can send real mail in production.
+## 4. Live Verification Checklist
+1. Log into the Admin panel at `/login`.
+2. Edit a project or profile field; confirm the updated content reflects on the public User site.
+3. Open **Resume Manager** in Admin, click **"Regenerate PDF"** to compile a fresh PDF from MongoDB and publish it to the `/resume` route.
+4. Test the Contact Form on `/contact` and verify the incoming message appears in Admin under **Contact Form**.
