@@ -12,7 +12,6 @@ import {
   Quote,
   Trophy,
   Mail,
-  Settings,
   Sparkles,
 } from "lucide-react";
 
@@ -27,8 +26,7 @@ const navItems = [
   { path: "/resume", label: "Resume PDF", icon: FileText },
   { path: "/testimonials", label: "Testimonials", icon: Quote },
   { path: "/achievements", label: "Achievements", icon: Trophy },
-  { path: "/messages", label: "Contact Form", icon: Mail },
-  { path: "/settings", label: "Settings", icon: Settings },
+  { path: "/contact-submissions", label: "Contact Form", icon: Mail },
 ];
 
 export const AdminSidebar: React.FC = () => {

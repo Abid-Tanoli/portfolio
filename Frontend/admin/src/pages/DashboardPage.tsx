@@ -94,7 +94,7 @@ export const DashboardPage: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Link
-                to="/messages"
+                to="/contact-submissions"
                 className="rounded-xl border border-slate-800 bg-slate-900 p-6 hover:border-slate-700 transition-all flex items-center gap-4"
               >
                 <div className="w-12 h-12 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">

@@ -4,7 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PortfolioProvider } from "@/context/PortfolioContext";
-import { profile } from "@/data/profile";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 function LazyBoundary({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
@@ -96,11 +96,12 @@ function PageFallback() {
 }
 
 function JsonLd() {
+  const { profile } = usePortfolio();
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
     name: profile.name,
-    jobTitle: "Full Stack Web Developer (MERN)",
+    jobTitle: profile.title || "Full Stack Web Developer (MERN)",
     email: `mailto:${profile.email}`,
     telephone: profile.phone,
     address: { "@type": "PostalAddress", addressLocality: "Karachi", addressCountry: "PK" },

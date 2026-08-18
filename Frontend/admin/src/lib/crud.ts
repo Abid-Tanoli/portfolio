@@ -28,6 +28,8 @@ export interface ResourceConfig {
   fields: FieldConfig[];
   columns: { name: string; label: string; max?: number }[];
   createLabel: string;
+  /** If the GET endpoint returns a wrapped object, specify which key holds the array, e.g. "skills" or "projects" */
+  arrayKey?: string;
 }
 
 const projectCategoryOptions = [
@@ -48,6 +50,7 @@ export const resourceConfigs: ResourceConfig[] = [
   {
     key: "projects",
     endpoint: "/projects",
+    arrayKey: "projects",
     title: "Projects",
     description: "Manage portfolio projects shown on the public site",
     createLabel: "New Project",
@@ -79,6 +82,7 @@ export const resourceConfigs: ResourceConfig[] = [
   {
     key: "skills",
     endpoint: "/skills",
+    arrayKey: "skills",
     title: "Skills",
     description: "Manage the skills taxonomy shown in the Skills section",
     createLabel: "New Skill",

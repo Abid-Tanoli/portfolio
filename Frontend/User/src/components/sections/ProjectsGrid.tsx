@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { categoryLabels, projects as curated } from "@/data/projects";
+import { categoryLabels } from "@/data/projects";
 import { useEnrichedProjects } from "@/hooks/useEnrichedProjects";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ProjectCard } from "@/components/project/ProjectCard";
@@ -28,8 +28,8 @@ export function ProjectsGrid({ featuredOnly }: { featuredOnly?: boolean }) {
           {c === "all" ? "All" : categoryLabels[c]}
           <span className="ml-1 font-mono text-[10px] text-muted-foreground">
             {c === "all"
-              ? curated.length
-              : curated.filter((p) => p.category === c).length}
+              ? projects.length
+              : projects.filter((p) => p.category === c).length}
           </span>
         </TabsTrigger>
       ))}

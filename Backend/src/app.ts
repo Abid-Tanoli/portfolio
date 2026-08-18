@@ -13,6 +13,7 @@ import { certificationsRouter } from "./routes/certifications.routes.js";
 import { achievementsRouter } from "./routes/achievements.routes.js";
 import { testimonialsRouter } from "./routes/testimonials.routes.js";
 import { contactSubmissionsRouter } from "./routes/contact-submissions.routes.js";
+import { resumeRouter } from "./routes/resume.routes.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.js";
 import { isDbConnected } from "./services/db.js";
 
@@ -64,6 +65,7 @@ app.use("/api/certifications", certificationsRouter);
 app.use("/api/achievements", achievementsRouter);
 app.use("/api/testimonials", testimonialsRouter);
 app.use("/api/contact-submissions", contactSubmissionsRouter);
+app.use("/api/resume", resumeRouter);
 app.use("/api/contact", contactRouter);
 app.use("/api/github", githubRouter);
 

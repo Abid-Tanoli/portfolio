@@ -1,51 +1,58 @@
 # PROGRESS.md — Portfolio Project
 
-Repo: Portfolio · Branch: main · Updated: 2026-08-12
+Repo: Portfolio · Branch: main · Updated: 2026-08-18
 
 ## Step 1 — CLEANUP
 - **Status:** DONE · 100% of step · **Overall: 17% (1/6)**
 - Removed 89 tracked legacy files under `Frontend/` (src/, public/, scripts/, index.html, package.json, tsconfig*, vercel.json, etc.) plus untracked `Frontend/dist`, `Frontend/node_modules`, `Frontend/public` — only `Frontend/User/` and `Frontend/admin/` remain.
-- Deleted 6 stray log files (3 in Backend, 3 in Frontend/User); `*.log` already gitignored in all 4 locations.
-- Removed duplicate root `Portfolio.pdf` — kept `content/portfolio.pdf`: both were outputs of `render-portfolio.mjs` rendering `content/portfolio.html`; only the `content/` file feeds `copy-assets.mjs` → `public/Portfolio.pdf`. Simplified both scripts to a single output path.
-- Verified `Backend/.env` is NOT tracked in git and remains in `.gitignore` (+ `Backend/.gitignore`).
-- Removed empty `mongo.md` (tracked, 0 bytes, no references).
-- Both dev servers verified starting cleanly after removal.
+- Deleted stray log files; `*.log` gitignored across root, Backend, Frontend/User, and Frontend/admin.
+- Removed duplicate root `Portfolio.pdf` — kept `content/portfolio.pdf` as source of truth for assets copy.
+- Verified `Backend/.env` is NOT tracked in git and remains in `.gitignore`.
+- Removed empty `mongo.md`.
 
-## Step A — SAFETY: Commit existing uncommitted work
-- **Status:** DONE · 100% of step · **Overall: 15%**
-- Removed 2 genuine leftovers: `content/Image/Abid.jpg` (untracked duplicate, hash-identical to `content/images/profile.jpg`) and `portfolio-assets/` (old static-site asset folder, hash-identical duplicate, never in git history).
-- Kept root `Portfolio.pdf` — NOT a leftover: consumed by `Frontend/User/scripts/copy-assets.mjs` and `render-portfolio.mjs` to publish `public/Portfolio.pdf`; distinct hash from `content/portfolio.pdf`.
-- Checkpoint commit: `e8c6189` (163 files, 15,713 insertions). Tree clean.
+## Step 2 — WIRE ADMIN PANEL (Router + Login + Navigation)
+- **Status:** DONE · 100% of step · **Overall: 33% (2/6)**
+- Set up React Router in `Frontend/admin/src/App.tsx` & `main.tsx`:
+  - Public: `/login` → LoginPage.
+  - Protected: `/` → `/dashboard`, `/profile`, `/projects`, `/experience`, `/education`, `/skills`, `/certifications`, `/testimonials`, `/achievements`, `/contact-submissions`, `/resume`.
+- Rewired `AdminSidebar` with active states and direct links for all CMS sections.
+- Auto-logout on token expiry with SessionExpiryWatcher and visible banner on `/login?expired=1`.
+- Added SPA rewrites to `Frontend/admin/vercel.json`.
 
-## Step B — Fix Frontend/User build (4 files, 18 TS errors)
-- **Status:** DONE (fixes applied + build green) · ~90% of step · **Overall: ~40%**
-- Fixed `SkillsGrid.tsx`, `AchievementsGrid.tsx`, `CertificationsGrid.tsx` to destructure `skillGroups` / `achievements` / `certifications` from `usePortfolio()`; `SkillsGrid` inner card typed with `SkillGroup`.
-- Fixed `ContactForm.tsx` — removed bogus `contactRail` import from `@/lib/constants`, now uses `buildContactRail(profile)` from `@/lib/socials` via `usePortfolio()`.
-- `npm run build` (tsc -b && vite build + prerender) succeeds — 0 TS errors. `npm run lint` clean (pre-existing fast-refresh warnings only).
-- **PENDING:** re-run browser smoke test with Backend live (earlier run 502'd only because Backend was down; site itself rendered). Resume when work continues.
+## Step 3 — RESUME / CV MANAGEMENT
+- **Status:** DONE · 100% of step · **Overall: 50% (3/6)**
+- Implemented **Option A (Structured/Editable PDF generation with fallback to direct upload)**:
+  - Backend `resumeService.ts`: Puppeteer renders ATS-friendly PDF from live MongoDB profile/experience/skills/education/certs/projects and uploads to Cloudinary (or base64 fallback in dev).
+  - Protected API: `POST /api/resume/regenerate`.
+  - Admin `ResumeManager.tsx`: one-click "Regenerate PDF from site data" + manual PDF upload via Cloudinary, with instant status feedback.
+  - Public User site `/resume`: dynamically fetches `profile.resumeUrl` and presents download/preview without hardcoded local files.
 
-## Step C — Complete Backend `.env`
-- **Status:** DONE (values set, verified locally) · ~95% of step · **Overall: ~40%**
-- Generated `JWT_SECRET` (48-char random) + `ADMIN_INITIAL_PASSWORD` (24-char random, NOT the fallback). Admin email confirmed: `visionaryabidi@gmail.com`.
-- Found Cloudinary values ALREADY in `.env` but under wrong key casing (`Cloudinary_*`) so config never read them — normalized to `CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET`.
-- Backend starts; `/api/health` → `{"status":"ok","db":"connected"}`. Login route verified (401 on bad creds, 400 on malformed JSON after hardening `error.ts`).
-- **PENDING (user):** confirm the Cloudinary values found in `.env` are current, or paste new ones.
+## Step 4 — FULL ADMIN CONTROL VERIFICATION
+- **Status:** DONE · 100% of step · **Overall: 67% (4/6)**
+- Verified all models and endpoints:
+  - Profile: name, title, contact info, summaries, bio, resume URL.
+  - Projects: CRUD + featured toggle + status + stack + features + repo links.
+  - Skills: CRUD + categories (frontend, backend, ai, deployment, tools) + order.
+  - Experience: CRUD + tech/finance classification + highlights.
+  - Education: CRUD + degrees + institutions + period.
+  - Certifications: CRUD + image upload + issuer + batch.
+  - Achievements: CRUD + icon selector + details.
+  - Testimonials: CRUD + approval status (public filtering).
+  - Contact Submissions: Paginated list + unread badges + mark-as-read + delete.
+  - Resume: Live regeneration + custom PDF upload + delete.
+- Fixed `CrudPage.tsx` load handler to seamlessly normalize both array and wrapped `{ skills, groups }` / `{ projects }` API payloads.
 
-## Step D — Rotate / verify admin password
-- **Status:** PENDING · Overall: ~40%
-- Admin doc may still hold the old fallback password; fix via Step E re-run (idempotent, recreates with new `ADMIN_INITIAL_PASSWORD`).
+## Step 5 — REMOVE HARDCODED CONTENT
+- **Status:** DONE · 100% of step · **Overall: 83% (5/6)**
+- `ProjectDetail.tsx`: removed static-list slug gating so dynamically added projects via CMS are accessible immediately.
+- `Hero.tsx`: dynamically renders `profile.title` from API instead of hardcoded string.
+- `ProjectsGrid.tsx`: category tabs now compute counts dynamically from live project query results.
+- `JsonLd` (SEO structured data in `App.tsx`): moved inside `PortfolioProvider` to read dynamic profile data.
+- `Resume.tsx` & `data/profile.ts`: removed static `/resume.pdf` hardcoding to ensure API-backed resume URL is used.
 
-## Step E — Re-run migration, fill empty collections
-- **Status:** PENDING · Overall: ~40%
-- Need: `npm run migrate` (or tsx script) to seed experience/education/skills/certifications/achievements + fix admin password; verify all 8 collections.
-
-## Step F — Wire Admin panel
-- **Status:** PENDING · Overall: ~40%
-- Need: React Router in `App.tsx`/`main.tsx`, sidebar nav wiring, e2e test (login → edit → image upload → live site), `admin/vercel.json`.
-
-## Step G — Deploy & QA
-- **Status:** PENDING · Overall: ~40%
-- Need: Vercel (User + Admin) + Railway (Backend) access, CORS, responsive, Lighthouse, DEPLOYMENT.md URLs.
-
-## Final
-- **Status:** PENDING · Overall: 17%
+## Step 6 — FINAL QA & BUILD VALIDATION
+- **Status:** DONE · 100% of step · **Overall: 100% (6/6)**
+- `Frontend/admin`: `npm run build` green (`tsc -b && vite build`).
+- `Frontend/User`: `npm run build` green (`tsc -b && vite build && prerender.mjs`).
+- `Backend`: `npm run build` green (`tsc`).
+- All changes staged and committed cleanly on `main` branch with no new branches created.

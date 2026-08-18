@@ -14,6 +14,8 @@ export interface IProfile extends Document {
   linkedin: string;
   linkedinPending: boolean;
   resumeUrl: string;
+  resumeSummary: string;
+  resumeUpdatedAt?: Date;
   profilePictureUrl: string;
   heroSublines: string[];
   heroSummary: string;
@@ -36,6 +38,8 @@ const ProfileSchema: Schema = new Schema(
     linkedin: { type: String, default: "" },
     linkedinPending: { type: Boolean, default: true },
     resumeUrl: { type: String, default: "/resume.pdf" },
+    resumeSummary: { type: String, default: "" },
+    resumeUpdatedAt: { type: Date },
     profilePictureUrl: { type: String, default: "" },
     heroSublines: [{ type: String }],
     heroSummary: { type: String, required: true },

@@ -28,7 +28,7 @@ async function request<T>(
   if (response.status === 401) {
     auth.logout();
     if (window.location.pathname !== "/login") {
-      window.location.href = "/login";
+      window.location.href = "/login?expired=1";
     }
     throw new Error("Session expired. Please log in again.");
   }

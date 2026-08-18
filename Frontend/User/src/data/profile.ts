@@ -19,7 +19,7 @@ export const profile = {
   githubUsername: "Abid-Tanoli",
   linkedin: "",
   linkedinPending: true,
-  resumeUrl: "/resume.pdf",
+  resumeUrl: "",
 };
 
 export const heroSublines = [

@@ -18,7 +18,9 @@ const defaultProfile = {
   githubUsername: "Abid-Tanoli",
   linkedin: "",
   linkedinPending: true,
-  resumeUrl: "/resume.pdf",
+  resumeUrl: "",
+  resumeSummary:
+    "Full Stack Web Developer with hands-on MERN expertise (MongoDB, Express.js, React.js, Node.js) and a growing specialization in AI-augmented development — integrating tools such as Antigravity, OpenAI Codex, Qwen, and OpenCode into real production workflows. Currently an intern at Bano Qabil Incubation Center, building BQ-PLAY, a live cricket scoring platform with real-time updates. A complementary 10+ year background in Accounting & Finance — including receivable management supervision — brings analytical rigor, structured problem-solving, and financial reporting discipline to every engineering decision.",
   profilePictureUrl: "",
   heroSublines: [
     "MERN Stack Developer",

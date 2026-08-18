@@ -1,7 +1,7 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, ExternalLink } from "lucide-react";
 import { GitHubIcon } from "@/components/shared/icons";
-import { projects } from "@/data/projects";
+import { projects as staticProjects } from "@/data/projects";
 import { useSeo } from "@/lib/seo";
 import { useEnrichedProjects } from "@/hooks/useEnrichedProjects";
 import { ProjectBadges } from "@/components/project/ProjectBadges";
@@ -13,7 +13,7 @@ import { formatDate } from "@/lib/utils";
 
 export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const { projects: enriched } = useEnrichedProjects();
+  const { projects: enriched, live } = useEnrichedProjects();
 
   const project = enriched.find((p) => p.slug === slug);
 
@@ -23,12 +23,15 @@ export default function ProjectDetail() {
     path: `/projects/${slug ?? ""}`,
   });
 
-  if (!slug || !projects.some((p) => p.slug === slug)) {
+  // Only redirect 404 once we have the live data (or confirmed the slug isn't in static list either)
+  const notInStatic = !staticProjects.some((p) => p.slug === slug);
+  if (!slug || (notInStatic && live && !project)) {
     return <Navigate to="/projects" replace />;
   }
 
   if (!project) {
-    return <Navigate to="/projects" replace />;
+    // Still loading or waiting for API — don't redirect prematurely
+    return null;
   }
 
   return (

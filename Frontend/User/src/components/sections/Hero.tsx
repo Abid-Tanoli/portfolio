@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Download, MessageCircle, MapPin } from "lucide-react";
 import { usePortfolio } from "@/context/PortfolioContext";
@@ -125,7 +125,7 @@ export function Hero() {
             {profile.name.split(" ")[0] + " "}
             <span className="text-gradient">{profile.name.split(" ").slice(1).join(" ")}</span>
             <span className="mt-3 block text-2xl font-semibold text-muted-foreground sm:text-3xl lg:text-4xl">
-              Full Stack Web Developer (MERN)
+              {profile.title || "Full Stack Web Developer (MERN)"}
             </span>
           </h1>
 
@@ -146,7 +146,7 @@ export function Hero() {
               </Link>
             </Button>
             <Button variant="secondary" size="lg" asChild>
-              <a href="/resume.pdf" download="Abid-Ali-Tanoli-Resume.pdf">
+              <a href={profile.resumeUrl || "/resume.pdf"} download="Abid-Ali-Tanoli-Resume.pdf">
                 <Download className="h-4 w-4" />
                 Download Resume
               </a>

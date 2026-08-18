@@ -11,8 +11,13 @@ interface RecordItem {
   [key: string]: unknown;
 }
 
-export const CrudPage: React.FC = () => {
-  const { resource } = useParams<{ resource: string }>();
+interface CrudPageProps {
+  resource?: string;
+}
+
+export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) => {
+  const { resource: resourceParam } = useParams<{ resource: string }>();
+  const resource = resourceProp ?? resourceParam;
   const config = getResourceConfig(resource ?? "");
 
   const [items, setItems] = useState<RecordItem[]>([]);
@@ -29,8 +34,27 @@ export const CrudPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.get<RecordItem[]>(config.endpoint);
-      setItems(Array.isArray(data) ? data : []);
+      const raw = await api.get<RecordItem[] | Record<string, unknown>>(config.endpoint);
+      // Handle both plain arrays and wrapped responses like {skills:[...], groups:[...]} or {projects:[...]}
+      // Use config.arrayKey if specified, otherwise find the first array of objects in the response
+      if (Array.isArray(raw)) {
+        setItems(raw);
+      } else if (raw && typeof raw === "object") {
+        const key = config.arrayKey;
+        if (key && Array.isArray((raw as Record<string, unknown>)[key])) {
+          setItems((raw as Record<string, unknown[]>)[key] as RecordItem[]);
+        } else {
+          // fallback: pick the first array of objects/empty arrays
+          const found = Object.values(raw).find(
+            (v): v is RecordItem[] =>
+              Array.isArray(v) &&
+              (v.length === 0 || (typeof v[0] === "object" && v[0] !== null && "_id" in (v[0] as object)))
+          );
+          setItems(found ?? []);
+        }
+      } else {
+        setItems([]);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load items");
     } finally {
