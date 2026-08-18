@@ -255,12 +255,18 @@ export async function regenerateResume(): Promise<RegenerateResult> {
   let resumeUrl: string;
   let warning: string | undefined;
   if (isCloudinaryConfigured()) {
-    const result = await uploadToCloudinary(pdfBuffer, {
-      folder: "resume",
-      resourceType: "raw",
-      filename: "Abid-Ali-Tanoli-Resume.pdf",
-    });
-    resumeUrl = result.url;
+    try {
+      const result = await uploadToCloudinary(pdfBuffer, {
+        folder: "resume",
+        resourceType: "raw",
+        filename: "Abid-Ali-Tanoli-Resume.pdf",
+      });
+      resumeUrl = result.url;
+    } catch (uploadErr) {
+      const b64 = pdfBuffer.toString("base64");
+      resumeUrl = `data:application/pdf;base64,${b64}`;
+      warning = `Cloudinary upload error (${uploadErr instanceof Error ? uploadErr.message : "auth error"}) — served as base64 Data URI in local dev. Configure valid Cloudinary credentials to host on CDN.`;
+    }
   } else {
     const b64 = pdfBuffer.toString("base64");
     resumeUrl = `data:application/pdf;base64,${b64}`;

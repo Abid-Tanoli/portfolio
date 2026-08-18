@@ -46,11 +46,14 @@ const ProjectSchema: Schema = new Schema(
     repoUrl: { type: String, required: true },
     links: [
       {
-        label: { type: String, required: true },
-        url: { type: String, required: true },
+        label: { type: String },
+        url: { type: String },
       },
     ],
-    startedAt: { type: String, required: true },
+    startedAt: {
+      type: String,
+      default: () => new Date().toISOString().slice(0, 10),
+    },
     isFeatured: { type: Boolean, default: false },
     repoNames: [{ type: String }],
     screenshotUrls: [{ type: String }],
