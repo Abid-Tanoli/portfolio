@@ -287,8 +287,10 @@ export async function regenerateResume(): Promise<RegenerateResult> {
       location: FALLBACK_PROFILE.location,
       github: FALLBACK_PROFILE.github,
       githubUsername: FALLBACK_PROFILE.githubUsername,
-      heroSummary: "",
-      careerGoals: "",
+      heroSummary: FALLBACK_SUMMARY,
+      careerGoals:
+        "To grow as a full stack engineer building reliable, AI-augmented web products, " +
+        "deepening expertise in cloud deployment and scalable system design.",
     });
   }
   profile.resumeUrl = resumeUrl;

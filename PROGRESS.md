@@ -56,3 +56,12 @@ Repo: Portfolio · Branch: main · Updated: 2026-08-18
 - `Frontend/User`: `npm run build` green (`tsc -b && vite build && prerender.mjs`).
 - `Backend`: `npm run build` green (`tsc`).
 - All changes staged and committed cleanly on `main` branch with no new branches created.
+
+## Step 7 - CLOUDINARY FIX VERIFIED (PART 2)
+- **Status:** DONE
+- Credentials on cloud `miiqsgaj` verified LIVE against Cloudinary Admin API (authenticated resources call -> HTTP 200). Same values confirmed present in `Backend/.env` (cloud name, key, secret + CLOUDINARY_URL).
+- Backend restarted locally (port 4000, DB connected).
+- Test image upload via `POST /api/upload` returns real CDN URL (no base64 fallback, no warning field).
+- Fixed bug in `resumeService.ts`: fallback Profile creation passed empty strings for required `heroSummary`/`careerGoals`, crashing `POST /api/resume/regenerate` with ValidationError whenever no Profile doc exists. Now uses FALLBACK_SUMMARY + default career goals text.
+- Resume regeneration now publishes PDF to Cloudinary raw storage -> real `res.cloudinary.com` URL (HTTP 200, application/pdf bytes).
+- Railway dashboard variables still need manual entry (railway CLI not installed locally).
