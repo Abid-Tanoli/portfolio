@@ -25,7 +25,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ title, description }) 
       <div className="flex items-center gap-4">
         {/* Open Public Site Link */}
         <a
-          href="http://localhost:5173"
+          href={import.meta.env.VITE_USER_SITE_URL || "http://localhost:5173"}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 text-xs font-medium hover:bg-slate-700 hover:text-white transition-all"

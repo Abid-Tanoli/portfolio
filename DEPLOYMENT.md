@@ -28,9 +28,11 @@ This portfolio uses the modern MERN architecture split into 3 independent servic
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret |
 | `CORS_ORIGINS` | Comma-separated allowed frontend origins (e.g. `https://abidtanoli.vercel.app,https://admin-abidtanoli.vercel.app`) |
 | `SMTP_HOST` | (Optional) SMTP host for contact email forwarding |
-| `SMTP_PORT` | (Optional) SMTP port |
+| `SMTP_PORT` | (Optional) SMTP port (default 587) |
+| `SMTP_SECURE` | (Optional) `true` for port 465, `false` otherwise |
 | `SMTP_USER` | (Optional) SMTP username |
 | `SMTP_PASS` | (Optional) SMTP password |
+| `SMTP_FROM` | (Optional) From address for outgoing contact emails |
 | `CONTACT_TO` | Email address receiving contact messages |
 
 ### Health Check Endpoint
@@ -69,6 +71,7 @@ Returns `{ status: "ok", db: "connected", uptime: ... }`.
 | Variable | Value |
 | :--- | :--- |
 | `VITE_API_BASE_URL` | Live backend API base URL (e.g. `https://portfolio-backend-production-xxxx.up.railway.app/api`) |
+| `VITE_USER_SITE_URL` | Live public site URL (e.g. `https://abidtanoli.vercel.app`) — used for "View Public Site" links |
 
 ---
 

@@ -114,7 +114,7 @@ export const DashboardPage: React.FC = () => {
               </Link>
 
               <a
-                href="http://localhost:5173"
+                href={import.meta.env.VITE_USER_SITE_URL || "http://localhost:5173"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-xl border border-slate-800 bg-slate-900 p-6 hover:border-slate-700 transition-all flex items-center gap-4"
