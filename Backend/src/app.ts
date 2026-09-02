@@ -22,7 +22,7 @@ export const app = express();
 app.disable("x-powered-by");
 
 const allowedOrigins = (
-  process.env.CORS_ORIGINS ?? "http://localhost:5173,http://localhost:5174,http://localhost:3000"
+  process.env.CORS_ORIGINS ?? "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:3000"
 )
   .split(",")
   .map((o) => o.trim())

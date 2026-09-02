@@ -12,8 +12,17 @@ async function ensureAdmin() {
     console.log("[portfolio-api] DB not connected, skipping ensureAdmin");
     return;
   }
-  const adminEmail = (process.env.ADMIN_INITIAL_EMAIL || "visionaryabidi@gmail.com").toLowerCase();
-  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || "3UsiPATb8ICQHwpW9LV0lYOz";
+
+  const adminEmail = process.env.ADMIN_INITIAL_EMAIL;
+  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    console.warn(
+      "[portfolio-api] ADMIN_INITIAL_EMAIL and/or ADMIN_INITIAL_PASSWORD not set — skipping admin seed. " +
+      "Set both env vars to create/reset the admin account on first run."
+    );
+    return;
+  }
 
   try {
     let admin = await Admin.findOne({ email: adminEmail });
@@ -38,6 +47,11 @@ async function ensureAdmin() {
 }
 
 async function bootstrap() {
+  if (!process.env.JWT_SECRET) {
+    console.error("[portfolio-api] JWT_SECRET is not set — refusing to start");
+    process.exit(1);
+  }
+
   await connectDb();
   await ensureAdmin();
   app.listen(PORT, () => {

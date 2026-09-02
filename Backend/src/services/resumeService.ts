@@ -251,9 +251,11 @@ export interface RegenerateResult {
 export async function regenerateResume(): Promise<RegenerateResult> {
   const html = await buildResumeDocument();
   const pdfBuffer = await renderPdf(html);
+  const pdfDataUri = `data:application/pdf;base64,${pdfBuffer.toString("base64")}`;
 
-  let resumeUrl: string;
+  let resumeUrl: string = pdfDataUri;
   let warning: string | undefined;
+
   if (isCloudinaryConfigured()) {
     try {
       const result = await uploadToCloudinary(pdfBuffer, {
@@ -261,15 +263,34 @@ export async function regenerateResume(): Promise<RegenerateResult> {
         resourceType: "raw",
         filename: "Abid-Ali-Tanoli-Resume.pdf",
       });
-      resumeUrl = result.url;
+
+      const cloudUrl = result.url;
+      const probe = await fetch(cloudUrl, { method: "HEAD" }).catch(() => null);
+      const cloudType = probe?.headers.get("content-type") ?? "";
+      const isRenderablePdf = !!probe && probe.ok && cloudType.includes("pdf");
+
+      if (isRenderablePdf) {
+        resumeUrl = cloudUrl;
+      } else {
+        warning =
+          "Cloudinary PDF URL was not reliably renderable in-browser, so the resume is served as an embedded PDF data URI for stable previewing.";
+      }
     } catch (uploadErr) {
-      const b64 = pdfBuffer.toString("base64");
-      resumeUrl = `data:application/pdf;base64,${b64}`;
-      warning = `Cloudinary upload error (${uploadErr instanceof Error ? uploadErr.message : "auth error"}) — served as base64 Data URI in local dev. Configure valid Cloudinary credentials to host on CDN.`;
+      console.error("[resumeService] Cloudinary upload FAILED — falling back to base64 Data URI");
+      console.error("[resumeService] Error name:", uploadErr instanceof Error ? uploadErr.name : "Unknown");
+      console.error("[resumeService] Error message:", uploadErr instanceof Error ? uploadErr.message : String(uploadErr));
+      if (uploadErr && typeof uploadErr === "object" && "status" in uploadErr) {
+        console.error("[resumeService] HTTP status:", (uploadErr as { status: number }).status);
+      }
+      if (uploadErr && typeof uploadErr === "object" && "http_code" in uploadErr) {
+        console.error("[resumeService] Cloudinary http_code:", (uploadErr as { http_code: number }).http_code);
+      }
+      if (uploadErr instanceof Error && uploadErr.stack) {
+        console.error("[resumeService] Stack:", uploadErr.stack);
+      }
+      warning = `Cloudinary upload error (${uploadErr instanceof Error ? uploadErr.message : "unknown"}) — served as base64 Data URI. Configure valid Cloudinary credentials to host on CDN.`;
     }
   } else {
-    const b64 = pdfBuffer.toString("base64");
-    resumeUrl = `data:application/pdf;base64,${b64}`;
     warning =
       "Cloudinary credentials missing. PDF served as base64 Data URI in local dev — configure Cloudinary to publish a real hosted URL.";
   }

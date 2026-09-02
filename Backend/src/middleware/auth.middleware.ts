@@ -17,8 +17,7 @@ declare global {
 export function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
   if (!secret) {
-    console.warn("[auth] JWT_SECRET is not set — falling back to temporary development secret");
-    return "dev-secret-change-in-production-123456789";
+    throw new Error("[auth] JWT_SECRET is not set — refusing to operate without a secure secret");
   }
   return secret;
 }

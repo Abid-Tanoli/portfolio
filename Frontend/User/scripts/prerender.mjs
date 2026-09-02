@@ -1,8 +1,9 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { mkdir, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 
 const PORT = 4173;
 const BASE = `http://localhost:${PORT}`;
@@ -32,6 +33,24 @@ const EDGE_CANDIDATES = [
 
 function findBrowser() {
   return EDGE_CANDIDATES.find((p) => existsSync(p)) ?? null;
+}
+
+// Fall back to plain client-side rendering (copy dist/index.html to each route)
+// so Vercel's vercel.json rewrites still resolve and the build never crashes
+// just because no headless browser could be found or launched.
+async function copySpaFallback() {
+  const spa = path.join(DIST, "index.html");
+  if (!existsSync(spa)) throw new Error("dist/index.html missing — run `npm run build` first");
+  let count = 0;
+  for (const route of ROUTES) {
+    const file = route === "/" ? "index.html" : `${route.replace(/^\//, "").replace(/\//g, "_")}.html`;
+    const out = path.join(DIST, file);
+    if (route !== "/") {
+      await writeFile(out, await readFile(spa, "utf8"), "utf8");
+      count += 1;
+    }
+  }
+  console.warn(`[prerender] no usable browser found — falling back to client-side rendering (${count} route fallbacks written)`);
 }
 
 function waitForPort(timeoutMs = 30000) {
@@ -88,38 +107,55 @@ try {
 
   await waitForPort();
 
-  const executablePath = findBrowser();
-  if (!executablePath) throw new Error("no Chrome/Edge binary found");
-
-  const browser = await puppeteer.launch({
-    executablePath,
-    headless: "new",
-    args: ["--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
-  });
-
-  const chunkFiles = await readdir(path.join(DIST, "assets"));
-
-  for (const route of ROUTES) {
-    const page = await browser.newPage();
-    await page.evaluateOnNewDocument(() => {
-      window.__PRERENDER__ = true;
-    });
-    await page.goto(`${BASE}${route}`, { waitUntil: "networkidle0", timeout: 45000 });
-    await new Promise((r) => setTimeout(r, 1200));
-    const html = optimizeHtml(
-      await page.evaluate(() => `<!doctype html>${document.documentElement.outerHTML}`),
-      route,
-      chunkFiles
-    );
-    const file = route === "/" ? "index.html" : `${route.replace(/^\//, "").replace(/\//g, "_")}.html`;
-    await mkdir(DIST, { recursive: true });
-    await writeFile(path.join(DIST, file), html, "utf8");
-    console.log(`prerendered ${route} -> ${file} (${html.length} bytes)`);
-    await page.close();
+  let executablePath = findBrowser();
+  let browser = null;
+  try {
+    if (executablePath) {
+      browser = await puppeteer.launch({
+        executablePath,
+        headless: "new",
+        args: [...chromium.args, "--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
+      });
+    } else {
+      // No system browser (e.g. Vercel's build container): use @sparticuz/chromium.
+      executablePath = await chromium.executablePath();
+      browser = await puppeteer.launch({
+        executablePath,
+        headless: "new",
+        args: [...chromium.args, "--no-sandbox", "--disable-dev-shm-usage"],
+      });
+    }
+  } catch (err) {
+    console.warn(`[prerender] could not launch a browser (${err?.message ?? err})`);
   }
 
-  await browser.close();
-  console.log("prerender complete");
+  if (!browser) {
+    await copySpaFallback();
+  } else {
+    const chunkFiles = await readdir(path.join(DIST, "assets"));
+
+    for (const route of ROUTES) {
+      const page = await browser.newPage();
+      await page.evaluateOnNewDocument(() => {
+        window.__PRERENDER__ = true;
+      });
+      await page.goto(`${BASE}${route}`, { waitUntil: "networkidle0", timeout: 45000 });
+      await new Promise((r) => setTimeout(r, 1200));
+      const html = optimizeHtml(
+        await page.evaluate(() => `<!doctype html>${document.documentElement.outerHTML}`),
+        route,
+        chunkFiles
+      );
+      const file = route === "/" ? "index.html" : `${route.replace(/^\//, "").replace(/\//g, "_")}.html`;
+      await mkdir(DIST, { recursive: true });
+      await writeFile(path.join(DIST, file), html, "utf8");
+      console.log(`prerendered ${route} -> ${file} (${html.length} bytes)`);
+      await page.close();
+    }
+
+    await browser.close();
+    console.log("prerender complete");
+  }
 } finally {
   if (server) server.kill();
 }
