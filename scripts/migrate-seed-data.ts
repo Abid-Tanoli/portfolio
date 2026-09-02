@@ -404,17 +404,25 @@ async function runMigration() {
   console.log("✅ MongoDB Connected.\n");
 
   // 1. Admin Seed
-  const adminEmail = (process.env.ADMIN_INITIAL_EMAIL || "visionaryabidi@gmail.com").toLowerCase();
-  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || "change_this_admin_password_123";
+  const adminEmail = process.env.ADMIN_INITIAL_EMAIL;
+  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD;
 
-  let admin = await Admin.findOne({ email: adminEmail });
-  if (!admin) {
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(adminPassword, salt);
-    admin = await Admin.create({ email: adminEmail, passwordHash });
-    console.log(`👤 Created Admin Account: ${adminEmail}`);
+  if (!adminEmail || !adminPassword) {
+    console.warn(
+      "⚠️ ADMIN_INITIAL_EMAIL and/or ADMIN_INITIAL_PASSWORD not set — skipping admin seed. " +
+        "Set both env vars to create the admin account during migration."
+    );
   } else {
-    console.log(`👤 Admin Account Exists: ${adminEmail}`);
+    const normalizedAdminEmail = adminEmail.toLowerCase();
+    let admin = await Admin.findOne({ email: normalizedAdminEmail });
+    if (!admin) {
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(adminPassword, salt);
+      admin = await Admin.create({ email: normalizedAdminEmail, passwordHash });
+      console.log(`👤 Created Admin Account: ${normalizedAdminEmail}`);
+    } else {
+      console.log(`👤 Admin Account Exists: ${normalizedAdminEmail}`);
+    }
   }
 
   // 2. Profile Seed

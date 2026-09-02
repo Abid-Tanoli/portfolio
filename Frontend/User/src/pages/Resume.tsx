@@ -25,6 +25,77 @@ export default function Resume() {
   });
   const showPdfFallback = window.__PRERENDER__ || pdfError || !resumeUrl;
 
+  const resumePreview = (
+    <div className="flex h-[75vh] w-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-lg">
+      <div className="border-b border-slate-200 bg-slate-50 px-6 py-5">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-500">Resume Preview</p>
+        <h2 className="mt-2 text-3xl font-bold tracking-tight">{name}</h2>
+        <p className="mt-1 text-sm text-slate-600">Full Stack Web Developer (MERN) · AI-Augmented Development</p>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-6 py-5 text-sm leading-7 text-slate-700">
+        <section className="mb-6">
+          <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Professional Summary</h3>
+          <p>
+            Full Stack Web Developer with hands-on MERN expertise, a growing specialization in AI-augmented development,
+            and a strong foundation in accounting, receivables, and operational analysis.
+          </p>
+        </section>
+
+        <section className="mb-6">
+          <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Core Skills</h3>
+          <div className="flex flex-wrap gap-2">
+            {[
+              "React",
+              "Node.js",
+              "Express",
+              "MongoDB",
+              "Tailwind",
+              "REST APIs",
+              "JWT",
+              "GitHub",
+              "AI coding workflows",
+              "Financial analysis",
+            ].map((skill) => (
+              <span key={skill} className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-6">
+          <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Experience</h3>
+          <div className="space-y-4">
+            <div>
+              <p className="font-semibold text-slate-800">Full Stack Web Development Intern — Bano Qabil Incubation Center</p>
+              <p>Building MERN applications, real-time scoring systems, and AI-assisted product workflows.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-slate-800">Accountant / Receivable Management — AK Electronics</p>
+              <p>Managing accounting operations, reconciliations, reporting, and client receivable oversight.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Education</h3>
+          <p className="font-semibold text-slate-800">B.Com — University of Karachi</p>
+          <p>Ongoing academic focus alongside software development and product-building work.</p>
+        </section>
+      </div>
+
+      <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-6 py-4 text-xs text-slate-600">
+        <span>PDF preview may be unavailable in some browsers</span>
+        {resumeUrl ? (
+          <a href={resumeUrl} target="_blank" rel="noreferrer" className="font-semibold text-indigo-600 hover:text-indigo-500">
+            Open PDF
+          </a>
+        ) : null}
+      </div>
+    </div>
+  );
+
   useEffect(() => {
     if (window.__PRERENDER__) return;
     let cancelled = false;
@@ -80,12 +151,7 @@ export default function Resume() {
             <FileText className="h-10 w-10 animate-pulse text-muted-foreground" />
           </div>
         ) : (
-          <iframe
-            src={resumeUrl}
-            title={`Resume of ${name}`}
-            className="h-[75vh] w-full rounded-xl border border-card-border bg-white shadow-lg"
-            onError={() => setPdfError(true)}
-          />
+          resumePreview
         )}
       </ScrollReveal>
     </section>

@@ -30,13 +30,15 @@ export async function uploadToCloudinary(
 
   const folder = options.folder ?? "portfolio";
   const resourceType = options.resourceType ?? "auto";
+  const safeFilename = options.filename?.trim();
 
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder,
         resource_type: resourceType,
-        public_id: options.filename ? options.filename.split(".")[0] : undefined,
+        public_id: safeFilename ?? undefined,
+        ...(resourceType === "raw" && safeFilename ? { format: safeFilename.split(".").pop() } : {}),
       },
       (error, result) => {
         if (error || !result) {

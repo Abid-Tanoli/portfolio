@@ -31,12 +31,12 @@ const defaultProfile = {
   heroSummary:
     "Full Stack Web Developer building real products with the MERN stack — and a growing specialization in AI-augmented development, using tools like Antigravity, Codex, Qwen, and OpenCode to ship faster and smarter. Currently building BQ-PLAY, a live cricket scoring platform, at Bano Qabil Incubation Center.",
   aboutSummary: [
-    "I'm a Full Stack Web Developer with hands-on MERN expertise — MongoDB, Express.js, React.js, and Node.js — and a fast-growing specialization in AI-augmented development.",
-    "I'm currently an intern at Bano Qabil Incubation Center, where I'm building BQ-PLAY.",
-    "What sets me apart: 8+ years of professional experience in Accounting & Finance.",
+    "I'm a Full Stack Web Developer with hands-on MERN expertise — MongoDB, Express.js, React.js, and Node.js — and a fast-growing specialization in AI-augmented development. I integrate modern AI coding tools (Antigravity, OpenAI Codex, Qwen, OpenCode) directly into my workflow to design, build, and debug features faster without compromising quality.",
+    "I'm currently an intern at Bano Qabil Incubation Center, where I'm building BQ-PLAY — a live cricket scoring platform with real-time updates, an admin scoring console, and player statistics. I work in an agile team with Git/GitHub, design REST APIs and MongoDB schemas, and ship responsive React frontends end-to-end.",
+    "What sets me apart: 8+ years of professional experience in Accounting & Finance. I've built financial MIS dashboards, managed receivables across South Pakistan, and filed tax reports — so I bring analytical rigor, structured problem-solving, and a business mindset to every engineering decision.",
   ],
   careerGoals:
-    "I'm on a trajectory from full stack development to AI-augmented engineering.",
+    "I'm on a trajectory from full stack development to AI-augmented engineering: building tools that combine the MERN stack with AI agents, prompt-driven workflows, and real-time systems — while keeping the financial discipline and analytical rigor I've carried from a decade in accounting.",
 };
 
 // GET /api/profile (Public)
