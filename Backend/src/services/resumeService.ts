@@ -260,21 +260,12 @@ export async function regenerateResume(): Promise<RegenerateResult> {
     try {
       const result = await uploadToCloudinary(pdfBuffer, {
         folder: "resume",
-        resourceType: "raw",
-        filename: "Abid-Ali-Tanoli-Resume.pdf",
+        resourceType: "image",
+        filename: "Abid-Ali-Tanoli-Resume",
       });
-
-      const cloudUrl = result.url;
-      const probe = await fetch(cloudUrl, { method: "HEAD" }).catch(() => null);
-      const cloudType = probe?.headers.get("content-type") ?? "";
-      const isRenderablePdf = !!probe && probe.ok && cloudType.includes("pdf");
-
-      if (isRenderablePdf) {
-        resumeUrl = cloudUrl;
-      } else {
-        warning =
-          "Cloudinary PDF URL was not reliably renderable in-browser, so the resume is served as an embedded PDF data URI for stable previewing.";
-      }
+      // A successful upload is the source of truth. Cloudinary delivery may not support
+      // HEAD consistently, but the returned secure URL is still the canonical asset URL.
+      resumeUrl = result.url;
     } catch (uploadErr) {
       console.error("[resumeService] Cloudinary upload FAILED — falling back to base64 Data URI");
       console.error("[resumeService] Error name:", uploadErr instanceof Error ? uploadErr.name : "Unknown");
