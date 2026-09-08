@@ -82,6 +82,15 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
+function periodStart(period: string): number {
+  const match = period.match(/(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{4})/i);
+  if (!match) return 0;
+  const month = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(
+    match[0].slice(0, 3).toLowerCase()
+  );
+  return Number(match[1]) * 12 + month;
+}
+
 export async function buildResumeDocument(): Promise<string> {
   const [profileDoc, experiences, education, skills, certifications, projects] = await Promise.all([
     Profile.findOne(),
@@ -89,9 +98,7 @@ export async function buildResumeDocument(): Promise<string> {
     Education.find().sort({ order: 1, _id: 1 }),
     Skill.find().sort({ category: 1, order: 1, _id: 1 }),
     Certification.find().sort({ order: 1, _id: 1 }),
-    Project.find({ category: { $in: ["flagship", "full-stack", "ai"] }, status: { $ne: "archived" } })
-      .sort({ order: 1, _id: 1 })
-      .limit(4),
+    Project.find().sort({ isFeatured: -1, order: 1, _id: 1 }),
   ]);
 
   const profile = profileDoc ?? (FALLBACK_PROFILE as typeof FALLBACK_PROFILE & { resumeSummary?: string });
@@ -146,39 +153,46 @@ export async function buildResumeDocument(): Promise<string> {
   </div>`);
   }
 
-  if (experiences.length > 0) {
+  const orderedExperiences = [...experiences].sort(
+    (a, b) => periodStart(b.period) - periodStart(a.period) || a.order - b.order
+  );
+
+  if (orderedExperiences.length > 0) {
     parts.push(`
   <h2>Experience</h2>`);
-    for (const exp of experiences) {
+    for (const exp of orderedExperiences) {
+      const highlights = (exp.highlights ?? []).slice(0, 2);
       parts.push(`
   <div class="entry">
     <div class="entry-head">
       <span><span class="role">${escapeHtml(exp.role)}</span> — <span class="org">${escapeHtml(exp.organization)}</span></span>
       <span class="period">${escapeHtml(exp.period)}</span>
     </div>
-    ${
-      exp.highlights.length > 0
-        ? `<ul>\n      ${exp.highlights.map((h: string) => `<li>${escapeHtml(h)}</li>`).join("\n      ")}\n    </ul>`
-        : ""
-    }
+    ${highlights.length > 0 ? `<ul>\n      ${highlights.map((h: string) => `<li>${escapeHtml(h)}</li>`).join("\n      ")}\n    </ul>` : ""}
   </div>`);
     }
   }
 
   if (projects.length > 0) {
+    const detailedProjects = projects.slice(0, 4);
+    const additionalProjects = projects.slice(4);
     parts.push(`
   <h2>Projects</h2>`);
-    for (const project of projects) {
+    for (const project of detailedProjects) {
       const repo = project.repoUrl ? project.repoUrl.replace(/^https?:\/\//, "") : "";
-      const bullets = (project.features ?? []).slice(0, 3);
+      const stack = (project.stack ?? []).slice(0, 6).join(", ");
       parts.push(`
   <div class="entry">
     <div class="entry-head">
       <span><span class="role">${escapeHtml(project.name)}</span> — ${escapeHtml(project.tagline || project.description)}</span>
       ${repo ? `<span class="period">${escapeHtml(repo)}</span>` : ""}
     </div>
-    ${bullets.length > 0 ? `<ul>\n      ${bullets.map((b: string) => `<li>${escapeHtml(b)}</li>`).join("\n      ")}\n    </ul>` : ""}
+    ${stack ? `<div class="skills"><b>Stack:</b> ${escapeHtml(stack)}</div>` : ""}
   </div>`);
+    }
+    if (additionalProjects.length > 0) {
+      parts.push(`
+  <div class="entry"><b>Additional Projects:</b> ${escapeHtml(additionalProjects.map((project) => project.name).join("; "))}</div>`);
     }
   }
 
