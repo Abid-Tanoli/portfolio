@@ -197,6 +197,7 @@ function findRepo(repoNames: string[], repos: RepoSummary[]) {
 function toPublicProject(project: any, repo?: RepoSummary) {
   return {
     id: project._id || project.slug,
+    _id: project._id,
     slug: project.slug,
     name: project.name,
     tagline: project.tagline,

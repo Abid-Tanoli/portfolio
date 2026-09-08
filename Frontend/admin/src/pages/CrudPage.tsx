@@ -48,7 +48,10 @@ export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) =>
           const found = Object.values(raw).find(
             (v): v is RecordItem[] =>
               Array.isArray(v) &&
-              (v.length === 0 || (typeof v[0] === "object" && v[0] !== null && "_id" in (v[0] as object)))
+              (v.length === 0 ||
+                (typeof v[0] === "object" &&
+                  v[0] !== null &&
+                  "_id" in (v[0] as object)))
           );
           setItems(found ?? []);
         }
@@ -99,8 +102,14 @@ export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) =>
       if (creating) {
         await api.post(config.endpoint, form);
       } else if (editing) {
+        if (!editing._id) {
+          setError("Cannot update: record ID is missing");
+          return;
+        }
+
         await api.put(`${config.endpoint}/${editing._id}`, form);
       }
+
       closeForm();
       await load();
     } catch (err) {
@@ -112,8 +121,16 @@ export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) =>
 
   const remove = async () => {
     if (!confirmDelete) return;
+
     setSaving(true);
+    setError(null);
+
     try {
+      if (!confirmDelete._id) {
+        setError("Cannot delete: record ID is missing");
+        return;
+      }
+
       await api.delete(`${config.endpoint}/${confirmDelete._id}`);
       setConfirmDelete(null);
       await load();
@@ -196,7 +213,10 @@ export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) =>
                   </tr>
                 ) : (
                   items.map((item) => (
-                    <tr key={item._id} className="border-b border-slate-800/60 hover:bg-slate-800/40 transition-colors">
+                    <tr
+                      key={item._id}
+                      className="border-b border-slate-800/60 hover:bg-slate-800/40 transition-colors"
+                    >
                       {config.columns.map((col) => (
                         <td key={col.name} className="px-4 py-3 text-slate-300">
                           {col.name === "isFeatured" || col.name === "approved" ? (
@@ -305,7 +325,14 @@ export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) =>
             <p className="text-sm text-slate-400 mb-6">
               This will permanently delete{" "}
               <span className="text-slate-200 font-semibold">
-                {String(confirmDelete.name ?? confirmDelete.title ?? confirmDelete.degree ?? confirmDelete.role ?? confirmDelete._id)}
+                {String(
+                  confirmDelete.name ??
+                    confirmDelete.title ??
+                    confirmDelete.degree ??
+                    confirmDelete.role ??
+                    confirmDelete._id ??
+                    "this record"
+                )}
               </span>
               . This action cannot be undone.
             </p>
