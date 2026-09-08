@@ -101,6 +101,14 @@ export async function buildResumeDocument(): Promise<string> {
     Project.find().sort({ isFeatured: -1, order: 1, _id: 1 }),
   ]);
 
+  console.log(
+    "[resumeService][DEBUG] fetched",
+    projects.length,
+    "projects and",
+    experiences.length,
+    "experience entries"
+  );
+
   const profile = profileDoc ?? (FALLBACK_PROFILE as typeof FALLBACK_PROFILE & { resumeSummary?: string });
   const name = profile.name || FALLBACK_PROFILE.name;
   const title =
