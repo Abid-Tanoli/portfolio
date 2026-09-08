@@ -106,7 +106,12 @@ export async function buildResumeDocument(): Promise<string> {
     projects.length,
     "projects and",
     experiences.length,
-    "experience entries"
+    "experience entries; db=",
+    Project.db.name,
+    "projectCollection=",
+    Project.collection.name,
+    "experienceCollection=",
+    Experience.collection.name
   );
 
   const profile = profileDoc ?? (FALLBACK_PROFILE as typeof FALLBACK_PROFILE & { resumeSummary?: string });
