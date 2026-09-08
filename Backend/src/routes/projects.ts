@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import mongoose from "mongoose";
 import { Project } from "../models/Project.js";
 import { getRepos, type RepoSummary } from "../services/githubService.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
@@ -228,6 +229,8 @@ projectsRouter.get(
   "/",
   asyncHandler(async (_req: Request, res: Response) => {
     let rawProjects: any[] = [];
+    let usingFallback = false;
+
     try {
       rawProjects = await Project.find().sort({ order: 1, createdAt: -1 }).lean();
     } catch (e) {
@@ -235,7 +238,10 @@ projectsRouter.get(
     }
 
     if (rawProjects.length === 0) {
+      // Fallback is ONLY for the public read-only list when the DB is down/empty.
+      // Admin CRUD must never operate against these objects (they have no real _id).
       rawProjects = fallbackProjects;
+      usingFallback = true;
     }
 
     let repos: RepoSummary[] = [];
@@ -249,7 +255,13 @@ projectsRouter.get(
     const projects = rawProjects.map((project) =>
       toPublicProject(project, findRepo(project.repoNames || [project.name], repos))
     );
-    res.json({ source: repos.length > 0 ? "github+database" : "database", projects });
+
+    res.json({
+      source: repos.length > 0 ? "github+database" : "database",
+      // isFallback tells the admin UI that these rows are NOT editable DB documents
+      isFallback: usingFallback,
+      projects,
+    });
   })
 );
 
@@ -294,6 +306,10 @@ projectsRouter.put(
   "/:id",
   requireAuth,
   asyncHandler(async (req: Request, res: Response) => {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      res.status(400).json({ error: "Invalid project id" });
+      return;
+    }
     const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!project) {
       res.status(404).json({ error: "Project not found" });
@@ -308,6 +324,10 @@ projectsRouter.delete(
   "/:id",
   requireAuth,
   asyncHandler(async (req: Request, res: Response) => {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      res.status(400).json({ error: "Invalid project id" });
+      return;
+    }
     const project = await Project.findByIdAndDelete(req.params.id);
     if (!project) {
       res.status(404).json({ error: "Project not found" });
@@ -328,6 +348,16 @@ projectsRouter.patch(
       return;
     }
 
+    // Validate every id before running any updates
+    const invalidIds = orders
+      .map((item: { id: string; order: number }) => item.id)
+      .filter((id) => !mongoose.isValidObjectId(id));
+
+    if (invalidIds.length > 0) {
+      res.status(400).json({ error: "Invalid project id(s) in reorder payload", ids: invalidIds });
+      return;
+    }
+
     const updates = orders.map((item: { id: string; order: number }) =>
       Project.findByIdAndUpdate(item.id, { order: item.order })
     );
@@ -336,3 +366,6 @@ projectsRouter.patch(
     res.json({ message: "Projects reordered successfully" });
   })
 );
+
+// Export fallback list for use by the seed script
+export { fallbackProjects };

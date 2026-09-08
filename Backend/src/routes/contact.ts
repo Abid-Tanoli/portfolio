@@ -61,6 +61,10 @@ contactRouter.post(
       }
     }
 
+    // Attempt to persist the submission to the database.
+    // If this fails, we still acknowledge receipt to the visitor but clearly flag
+    // the failure in server logs and in the response body (saved: false).
+    let saved = false;
     try {
       const { ContactSubmission } = await import("../models/ContactSubmission.js");
       await ContactSubmission.create({
@@ -70,17 +74,26 @@ contactRouter.post(
         submittedAt: new Date(),
         read: false,
       });
+      saved = true;
     } catch (err) {
-      console.warn("[contact] DB logging failed:", err);
+      // Upgraded from console.warn so this appears in standard error log monitoring.
+      console.error(
+        "[contact] DB write failed — submission was NOT persisted to the database. " +
+          "Check MongoDB connectivity (GET /api/health -> db field). Error:",
+        err
+      );
     }
 
     if (!emailSent && !isContactConfigured()) {
-      // If SMTP is not set up, but submission was received (and saved to DB if connected)
-      res.status(200).json({ ok: true, note: "Message saved to database. SMTP email delivery pending configuration." });
+      res.status(200).json({
+        ok: true,
+        saved,
+        note: "Message received. SMTP email delivery pending configuration.",
+      });
       return;
     }
 
-    res.status(200).json({ ok: true, messageId });
+    res.status(200).json({ ok: true, saved, messageId });
   })
 );
 

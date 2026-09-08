@@ -10,14 +10,15 @@ const fileFilter = (_req: Request, file: Express.Multer.File, cb: multer.FileFil
     "image/png",
     "image/webp",
     "image/gif",
-    "image/svg+xml",
+    // SVG intentionally excluded: SVG files can carry embedded <script> tags and
+    // event-handler attributes, creating a stored-XSS vector if ever served inline.
     "application/pdf",
   ];
 
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error(`Invalid file type: ${file.mimetype}. Only images (JPG, PNG, WebP, GIF, SVG) and PDFs are allowed.`));
+    cb(new Error(`Invalid file type: ${file.mimetype}. Only images (JPG, PNG, WebP, GIF) and PDFs are allowed.`));
   }
 };
 

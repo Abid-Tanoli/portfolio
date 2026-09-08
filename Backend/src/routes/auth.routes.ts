@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
 import { Admin } from "../models/Admin.js";
 import { signToken, requireAuth } from "../middleware/auth.middleware.js";
@@ -6,9 +6,32 @@ import { asyncHandler } from "./_helpers.js";
 
 export const authRouter = Router();
 
+// Per-IP rate limiter for the login endpoint — same pattern used in contact.ts
+const LOGIN_WINDOW_MS = 15 * 60_000; // 15 minutes
+const LOGIN_MAX_ATTEMPTS = 10;
+const loginHits = new Map<string, { count: number; windowStart: number }>();
+
+function loginRateLimit(req: Request, res: Response, next: NextFunction) {
+  const ip = req.ip ?? "unknown";
+  const now = Date.now();
+  const entry = loginHits.get(ip);
+
+  if (!entry || now - entry.windowStart > LOGIN_WINDOW_MS) {
+    loginHits.set(ip, { count: 1, windowStart: now });
+    return next();
+  }
+  if (entry.count >= LOGIN_MAX_ATTEMPTS) {
+    res.status(429).json({ error: "Too many login attempts. Please wait 15 minutes and try again." });
+    return;
+  }
+  entry.count += 1;
+  return next();
+}
+
 // POST /api/auth/login
 authRouter.post(
   "/login",
+  loginRateLimit,
   asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
     if (!email || !password) {
