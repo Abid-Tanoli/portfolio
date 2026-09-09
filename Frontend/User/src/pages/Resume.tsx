@@ -15,7 +15,7 @@ interface ApiProfile {
 
 export default function Resume() {
   const [resumeUrl, setResumeUrl] = useState(FALLBACK_RESUME_URL);
-  const [name, setName] = useState("Abid Ali Tanoli");
+  const [name, setName] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [iframeError, setIframeError] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -107,7 +107,7 @@ export default function Resume() {
           <iframe
             ref={iframeRef}
             src={resumeUrl}
-            title={`Resume of ${name}`}
+            title={name ? `Resume of ${name}` : "Resume"}
             className="h-[80vh] w-full rounded-xl border border-slate-200 shadow-lg"
             onError={() => setIframeError(true)}
           />

@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+import mongoose from "mongoose";
 import { Profile } from "../models/Profile.js";
 import { Experience } from "../models/Experience.js";
 import { Education } from "../models/Education.js";
@@ -6,6 +7,7 @@ import { Skill } from "../models/Skill.js";
 import { Certification } from "../models/Certification.js";
 import { Project } from "../models/Project.js";
 import { uploadToCloudinary, isCloudinaryConfigured } from "../config/cloudinary.js";
+import { isDbConnected } from "./db.js";
 
 const FALLBACK_PROFILE = {
   name: "Abid Ali Tanoli",
@@ -92,6 +94,10 @@ function periodStart(period: string): number {
 }
 
 export async function buildResumeDocument(): Promise<string> {
+  if (!isDbConnected() || mongoose.connection.readyState !== 1) {
+    throw new Error("Database connection is not ready for resume generation.");
+  }
+
   const [profileDoc, experiences, education, skills, certifications, projects] = await Promise.all([
     Profile.findOne(),
     Experience.find().sort({ order: 1, _id: 1 }),
@@ -101,18 +107,20 @@ export async function buildResumeDocument(): Promise<string> {
     Project.find().sort({ isFeatured: -1, order: 1, _id: 1 }),
   ]);
 
-  console.log(
-    "[resumeService][DEBUG] fetched",
-    projects.length,
-    "projects and",
-    experiences.length,
-    "experience entries; db=",
-    Project.db.name,
-    "projectCollection=",
-    Project.collection.name,
-    "experienceCollection=",
-    Experience.collection.name
-  );
+  if (projects.length === 0 || experiences.length === 0) {
+    console.warn(
+      "[resumeService][WARN] unexpectedly low live data:",
+      projects.length,
+      "projects and",
+      experiences.length,
+      "experience entries; db=",
+      Project.db.name,
+      "projectCollection=",
+      Project.collection.name,
+      "experienceCollection=",
+      Experience.collection.name
+    );
+  }
 
   const profile = profileDoc ?? (FALLBACK_PROFILE as typeof FALLBACK_PROFILE & { resumeSummary?: string });
   const name = profile.name || FALLBACK_PROFILE.name;
@@ -294,19 +302,13 @@ export async function regenerateResume(): Promise<RegenerateResult> {
       // HEAD consistently, but the returned secure URL is still the canonical asset URL.
       resumeUrl = result.url;
     } catch (uploadErr) {
+      const errorDetails = getCloudinaryErrorDetails(uploadErr);
       console.error("[resumeService] Cloudinary upload FAILED — falling back to base64 Data URI");
-      console.error("[resumeService] Error name:", uploadErr instanceof Error ? uploadErr.name : "Unknown");
-      console.error("[resumeService] Error message:", uploadErr instanceof Error ? uploadErr.message : String(uploadErr));
-      if (uploadErr && typeof uploadErr === "object" && "status" in uploadErr) {
-        console.error("[resumeService] HTTP status:", (uploadErr as { status: number }).status);
-      }
-      if (uploadErr && typeof uploadErr === "object" && "http_code" in uploadErr) {
-        console.error("[resumeService] Cloudinary http_code:", (uploadErr as { http_code: number }).http_code);
-      }
+      console.error("[resumeService] Cloudinary error:", errorDetails);
       if (uploadErr instanceof Error && uploadErr.stack) {
         console.error("[resumeService] Stack:", uploadErr.stack);
       }
-      warning = `Cloudinary upload error (${uploadErr instanceof Error ? uploadErr.message : "unknown"}) — served as base64 Data URI. Configure valid Cloudinary credentials to host on CDN.`;
+      warning = `Cloudinary upload error (${errorDetails}) — served as base64 Data URI. Configure valid Cloudinary credentials to host on CDN.`;
     }
   } else {
     warning =
@@ -337,4 +339,27 @@ export async function regenerateResume(): Promise<RegenerateResult> {
   await profile.save();
 
   return { resumeUrl, updatedAt: profile.resumeUpdatedAt.toISOString(), warning };
+}
+
+function getCloudinaryErrorDetails(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  if (error && typeof error === "object") {
+    const details = error as { message?: unknown; error?: unknown; http_code?: unknown; status?: unknown };
+    const nestedMessage =
+      details.message ??
+      (details.error && typeof details.error === "object" && "message" in details.error
+        ? (details.error as { message: unknown }).message
+        : details.error);
+    const status = details.http_code ?? details.status;
+    if (nestedMessage || status) {
+      return [status && `HTTP ${status}`, nestedMessage].filter(Boolean).join(": ");
+    }
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return "Unknown Cloudinary error";
+    }
+  }
+  return "Unknown Cloudinary error";
 }
