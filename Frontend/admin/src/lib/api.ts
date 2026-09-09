@@ -39,10 +39,14 @@ async function request<T>(
     : await response.text();
 
   if (!response.ok) {
-    const errorMessage =
-      typeof data === "object" && data !== null && "error" in data
-        ? (data as { error: string }).error
-        : "An unexpected API error occurred";
+    const errorMessage = (() => {
+      if (typeof data !== "object" || data === null || !("error" in data)) {
+        return "An unexpected API error occurred";
+      }
+
+      const payload = data as { error: string; details?: string[] };
+      return payload.details?.length ? `${payload.error}: ${payload.details.join(", ")}` : payload.error;
+    })();
     throw new Error(errorMessage);
   }
 

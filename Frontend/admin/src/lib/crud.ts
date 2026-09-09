@@ -246,6 +246,9 @@ export function emptyRecord(config: ResourceConfig): Record<string, unknown> {
       case "linkList":
         record[field.name] = [];
         break;
+      case "select":
+        record[field.name] = field.defaultValue ?? field.options?.[0]?.value ?? "";
+        break;
       default:
         record[field.name] = field.defaultValue ?? "";
     }

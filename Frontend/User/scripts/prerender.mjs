@@ -41,16 +41,24 @@ function findBrowser() {
 async function copySpaFallback() {
   const spa = path.join(DIST, "index.html");
   if (!existsSync(spa)) throw new Error("dist/index.html missing — run `npm run build` first");
+  const html = await readFile(spa, "utf8");
   let count = 0;
   for (const route of ROUTES) {
     const file = route === "/" ? "index.html" : `${route.replace(/^\//, "").replace(/\//g, "_")}.html`;
     const out = path.join(DIST, file);
     if (route !== "/") {
-      await writeFile(out, await readFile(spa, "utf8"), "utf8");
+      await writeFile(out, html, "utf8");
       count += 1;
     }
   }
   console.warn(`[prerender] no usable browser found — falling back to client-side rendering (${count} route fallbacks written)`);
+}
+
+async function writeSpaFallback(route) {
+  if (route === "/") return;
+  const spa = path.join(DIST, "index.html");
+  const file = `${route.replace(/^\//, "").replace(/\//g, "_")}.html`;
+  await writeFile(path.join(DIST, file), await readFile(spa, "utf8"), "utf8");
 }
 
 function waitForPort(timeoutMs = 30000) {
@@ -135,25 +143,32 @@ try {
     const chunkFiles = await readdir(path.join(DIST, "assets"));
 
     for (const route of ROUTES) {
-      const page = await browser.newPage();
-      await page.evaluateOnNewDocument(() => {
-        window.__PRERENDER__ = true;
-      });
-      await page.goto(`${BASE}${route}`, { waitUntil: "networkidle0", timeout: 45000 });
-      await new Promise((r) => setTimeout(r, 1200));
-      const html = optimizeHtml(
-        await page.evaluate(() => `<!doctype html>${document.documentElement.outerHTML}`),
-        route,
-        chunkFiles
-      );
-      const file = route === "/" ? "index.html" : `${route.replace(/^\//, "").replace(/\//g, "_")}.html`;
-      await mkdir(DIST, { recursive: true });
-      await writeFile(path.join(DIST, file), html, "utf8");
-      console.log(`prerendered ${route} -> ${file} (${html.length} bytes)`);
-      await page.close();
+      let page = null;
+      try {
+        page = await browser.newPage();
+        await page.evaluateOnNewDocument(() => {
+          window.__PRERENDER__ = true;
+        });
+        await page.goto(`${BASE}${route}`, { waitUntil: "domcontentloaded", timeout: 45000 });
+        await new Promise((r) => setTimeout(r, 1200));
+        const html = optimizeHtml(
+          await page.evaluate(() => `<!doctype html>${document.documentElement.outerHTML}`),
+          route,
+          chunkFiles
+        );
+        const file = route === "/" ? "index.html" : `${route.replace(/^\//, "").replace(/\//g, "_")}.html`;
+        await mkdir(DIST, { recursive: true });
+        await writeFile(path.join(DIST, file), html, "utf8");
+        console.log(`prerendered ${route} -> ${file} (${html.length} bytes)`);
+      } catch (err) {
+        await writeSpaFallback(route);
+        console.warn(`[prerender] route ${route} failed (${err?.message ?? err}); wrote SPA fallback`);
+      } finally {
+        await page?.close().catch(() => {});
+      }
     }
 
-    await browser.close();
+    await browser.close().catch(() => {});
     console.log("prerender complete");
   }
 } finally {

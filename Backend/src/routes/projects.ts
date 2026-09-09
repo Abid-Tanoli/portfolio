@@ -235,7 +235,7 @@ projectsRouter.get(
 
     try {
       rawProjects = await Project.find({ isVisible: { $ne: false } }).sort({ order: 1, createdAt: -1 }).lean();
-      canUseFallback = !(await Project.exists());
+      canUseFallback = !(await Project.exists({}));
     } catch (e) {
       console.warn("[projects] Error fetching projects from MongoDB, using fallback array");
       canUseFallback = true;

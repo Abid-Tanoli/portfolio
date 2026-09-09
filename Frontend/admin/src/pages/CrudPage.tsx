@@ -95,7 +95,46 @@ export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) =>
     setCreating(false);
   };
 
+  const slugify = (value: string) =>
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  const handleFieldChange = (name: string, value: unknown) => {
+    setForm((prev) => {
+      const next = { ...prev, [name]: value };
+      if (creating && config.key === "projects" && name === "name" && typeof value === "string") {
+        const previousSlug = typeof prev.slug === "string" ? prev.slug : "";
+        const previousName = typeof prev.name === "string" ? prev.name : "";
+        if (!previousSlug || previousSlug === slugify(previousName)) {
+          next.slug = slugify(value);
+        }
+      }
+      return next;
+    });
+  };
+
+  const validateForm = () => {
+    const missing = config.fields
+      .filter((field) => field.required)
+      .find((field) => {
+        const value = form[field.name];
+        return value === undefined || value === null || (typeof value === "string" && !value.trim());
+      });
+
+    if (missing) {
+      setError(`${missing.label} is required`);
+      return false;
+    }
+
+    return true;
+  };
+
   const save = async () => {
+    if (!validateForm()) return;
+
     setSaving(true);
     setError(null);
     try {
@@ -321,7 +360,7 @@ export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) =>
                   <Field
                     field={field}
                     value={form[field.name]}
-                    onChange={(name, value) => setForm((prev) => ({ ...prev, [name]: value }))}
+                    onChange={handleFieldChange}
                   />
                   {field.help && <p className="mt-1 text-xs text-slate-500">{field.help}</p>}
                 </div>

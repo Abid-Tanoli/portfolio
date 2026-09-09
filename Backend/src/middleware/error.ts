@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import multer from "multer";
 import mongoose from "mongoose";
 
 export class AppError extends Error {
@@ -47,6 +48,13 @@ export function errorHandler(
   if (err instanceof mongoose.Error.ValidationError) {
     const messages = Object.values(err.errors).map((e) => e.message);
     res.status(400).json({ error: "Validation failed", details: messages });
+    return;
+  }
+
+  // Multer upload limits and parser errors should be actionable in Admin.
+  if (err instanceof multer.MulterError) {
+    const message = err.code === "LIMIT_FILE_SIZE" ? "File is too large. Maximum upload size is 5 MB." : err.message;
+    res.status(400).json({ error: message });
     return;
   }
 
