@@ -6,6 +6,7 @@ export interface ICertification extends Document {
   batch: string;
   imageUrl?: string;
   order: number;
+  isVisible: boolean;
 }
 
 const CertificationSchema: Schema = new Schema(
@@ -15,6 +16,7 @@ const CertificationSchema: Schema = new Schema(
     batch: { type: String, default: "" },
     imageUrl: { type: String },
     order: { type: Number, default: 0 },
+    isVisible: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

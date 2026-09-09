@@ -5,6 +5,7 @@ export interface IAchievement extends Document {
   detail: string;
   icon: string;
   order: number;
+  isVisible: boolean;
 }
 
 const AchievementSchema: Schema = new Schema(
@@ -13,6 +14,7 @@ const AchievementSchema: Schema = new Schema(
     detail: { type: String, required: true },
     icon: { type: String, default: "award" },
     order: { type: Number, default: 0 },
+    isVisible: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

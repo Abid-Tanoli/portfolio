@@ -12,6 +12,7 @@ export interface ISkill extends Document {
   category: "frontend" | "backend" | "ai" | "deployment" | "tools";
   icon?: string;
   order: number;
+  isVisible: boolean;
 }
 
 const SkillSchema: Schema = new Schema(
@@ -24,6 +25,7 @@ const SkillSchema: Schema = new Schema(
     },
     icon: { type: String },
     order: { type: Number, default: 0 },
+    isVisible: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

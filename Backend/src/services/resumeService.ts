@@ -100,11 +100,11 @@ export async function buildResumeDocument(): Promise<string> {
 
   const [profileDoc, experiences, education, skills, certifications, projects] = await Promise.all([
     Profile.findOne(),
-    Experience.find().sort({ order: 1, _id: 1 }),
-    Education.find().sort({ order: 1, _id: 1 }),
-    Skill.find().sort({ category: 1, order: 1, _id: 1 }),
-    Certification.find().sort({ order: 1, _id: 1 }),
-    Project.find().sort({ isFeatured: -1, order: 1, _id: 1 }),
+    Experience.find({ isVisible: { $ne: false } }).sort({ order: 1, _id: 1 }),
+    Education.find({ isVisible: { $ne: false } }).sort({ order: 1, _id: 1 }),
+    Skill.find({ isVisible: { $ne: false } }).sort({ category: 1, order: 1, _id: 1 }),
+    Certification.find({ isVisible: { $ne: false } }).sort({ order: 1, _id: 1 }),
+    Project.find({ isVisible: { $ne: false } }).sort({ isFeatured: -1, order: 1, _id: 1 }),
   ]);
 
   if (projects.length === 0 || experiences.length === 0) {

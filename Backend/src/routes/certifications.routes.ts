@@ -9,6 +9,16 @@ export const certificationsRouter = Router();
 certificationsRouter.get(
   "/",
   asyncHandler(async (_req: Request, res: Response) => {
+    const list = await Certification.find({ isVisible: { $ne: false } }).sort({ order: 1, createdAt: -1 });
+    res.json(list);
+  })
+);
+
+// GET /api/certifications/admin (Protected list, including hidden records)
+certificationsRouter.get(
+  "/admin",
+  requireAuth,
+  asyncHandler(async (_req: Request, res: Response) => {
     const list = await Certification.find().sort({ order: 1, createdAt: -1 });
     res.json(list);
   })
@@ -22,6 +32,28 @@ certificationsRouter.post(
     const item = new Certification(req.body);
     await item.save();
     res.status(201).json(item);
+  })
+);
+
+// PATCH /api/certifications/:id/visibility (Protected)
+certificationsRouter.patch(
+  "/:id/visibility",
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    if (typeof req.body?.isVisible !== "boolean") {
+      res.status(400).json({ error: "isVisible must be a boolean" });
+      return;
+    }
+    const item = await Certification.findByIdAndUpdate(
+      req.params.id,
+      { isVisible: req.body.isVisible },
+      { new: true, runValidators: true }
+    );
+    if (!item) {
+      res.status(404).json({ error: "Certification not found" });
+      return;
+    }
+    res.json(item);
   })
 );
 

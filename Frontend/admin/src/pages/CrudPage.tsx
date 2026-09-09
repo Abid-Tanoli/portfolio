@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Plus, Pencil, Trash2, RefreshCw, X, Loader2, Save, AlertTriangle } from "lucide-react";
+import { Plus, Pencil, Trash2, RefreshCw, X, Loader2, Save, AlertTriangle, Eye, EyeOff } from "lucide-react";
 import { api } from "../lib/api";
 import { getResourceConfig, emptyRecord, type FieldConfig } from "../lib/crud";
 import { Field } from "../components/ui/Field";
@@ -34,7 +34,7 @@ export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) =>
     setLoading(true);
     setError(null);
     try {
-      const raw = await api.get<RecordItem[] | Record<string, unknown>>(config.endpoint);
+      const raw = await api.get<RecordItem[] | Record<string, unknown>>(config.listEndpoint ?? config.endpoint);
       // Handle both plain arrays and wrapped responses like {skills:[...], groups:[...]} or {projects:[...]}
       // Use config.arrayKey if specified, otherwise find the first array of objects in the response
       if (Array.isArray(raw)) {
@@ -141,6 +141,29 @@ export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) =>
     }
   };
 
+  const toggleVisibility = async (item: RecordItem) => {
+    if (!item._id) {
+      setError("Cannot change visibility: record ID is missing");
+      return;
+    }
+
+    const nextVisibility = item.isVisible === false;
+    setSaving(true);
+    setError(null);
+    try {
+      await api.patch(`${config.endpoint}/${item._id}/visibility`, { isVisible: nextVisibility });
+      setItems((current) =>
+        current.map((currentItem) =>
+          currentItem._id === item._id ? { ...currentItem, isVisible: nextVisibility } : currentItem
+        )
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to change visibility");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const displayValue = (item: RecordItem, name: string) => {
     const value = item[name];
     if (name === "isFeatured" || name === "approved") return Boolean(value) ? "Yes" : "No";
@@ -215,7 +238,9 @@ export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) =>
                   items.map((item) => (
                     <tr
                       key={item._id}
-                      className="border-b border-slate-800/60 hover:bg-slate-800/40 transition-colors"
+                      className={`border-b border-slate-800/60 hover:bg-slate-800/40 transition-colors ${
+                        item.isVisible === false ? "opacity-60" : ""
+                      }`}
                     >
                       {config.columns.map((col) => (
                         <td key={col.name} className="px-4 py-3 text-slate-300">
@@ -236,6 +261,19 @@ export const CrudPage: React.FC<CrudPageProps> = ({ resource: resourceProp }) =>
                       ))}
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-2">
+                          {item.isVisible === false && (
+                            <span className="inline-flex items-center rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-400">
+                              Hidden
+                            </span>
+                          )}
+                          <button
+                            onClick={() => void toggleVisibility(item)}
+                            disabled={saving}
+                            className="p-2 rounded-lg border border-slate-700 text-slate-400 hover:text-amber-300 hover:border-amber-500/40 disabled:opacity-50 transition-all cursor-pointer"
+                            title={item.isVisible === false ? "Show publicly" : "Hide publicly"}
+                          >
+                            {item.isVisible === false ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                          </button>
                           <button
                             onClick={() => openEdit(item)}
                             className="p-2 rounded-lg border border-slate-700 text-slate-400 hover:text-indigo-300 hover:border-indigo-500/40 transition-all cursor-pointer"

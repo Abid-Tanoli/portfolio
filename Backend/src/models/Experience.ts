@@ -8,6 +8,7 @@ export interface IExperience extends Document {
   summary: string;
   highlights: string[];
   order: number;
+  isVisible: boolean;
 }
 
 const ExperienceSchema: Schema = new Schema(
@@ -19,6 +20,7 @@ const ExperienceSchema: Schema = new Schema(
     summary: { type: String, required: true },
     highlights: [{ type: String }],
     order: { type: Number, default: 0 },
+    isVisible: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

@@ -6,6 +6,7 @@ export interface IEducation extends Document {
   period: string;
   note?: string;
   order: number;
+  isVisible: boolean;
 }
 
 const EducationSchema: Schema = new Schema(
@@ -15,6 +16,7 @@ const EducationSchema: Schema = new Schema(
     period: { type: String, required: true },
     note: { type: String },
     order: { type: Number, default: 0 },
+    isVisible: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

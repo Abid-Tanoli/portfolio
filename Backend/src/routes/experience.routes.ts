@@ -9,6 +9,16 @@ export const experienceRouter = Router();
 experienceRouter.get(
   "/",
   asyncHandler(async (_req: Request, res: Response) => {
+    const list = await Experience.find({ isVisible: { $ne: false } }).sort({ order: 1, createdAt: -1 });
+    res.json(list);
+  })
+);
+
+// GET /api/experience/admin (Protected list, including hidden records)
+experienceRouter.get(
+  "/admin",
+  requireAuth,
+  asyncHandler(async (_req: Request, res: Response) => {
     const list = await Experience.find().sort({ order: 1, createdAt: -1 });
     res.json(list);
   })
@@ -22,6 +32,28 @@ experienceRouter.post(
     const item = new Experience(req.body);
     await item.save();
     res.status(201).json(item);
+  })
+);
+
+// PATCH /api/experience/:id/visibility (Protected)
+experienceRouter.patch(
+  "/:id/visibility",
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    if (typeof req.body?.isVisible !== "boolean") {
+      res.status(400).json({ error: "isVisible must be a boolean" });
+      return;
+    }
+    const item = await Experience.findByIdAndUpdate(
+      req.params.id,
+      { isVisible: req.body.isVisible },
+      { new: true, runValidators: true }
+    );
+    if (!item) {
+      res.status(404).json({ error: "Experience record not found" });
+      return;
+    }
+    res.json(item);
   })
 );
 

@@ -23,6 +23,7 @@ export interface FieldConfig {
 export interface ResourceConfig {
   key: string;
   endpoint: string;
+  listEndpoint?: string;
   title: string;
   description: string;
   fields: FieldConfig[];
@@ -50,6 +51,7 @@ export const resourceConfigs: ResourceConfig[] = [
   {
     key: "projects",
     endpoint: "/projects",
+    listEndpoint: "/projects/admin",
     arrayKey: "projects",
     title: "Projects",
     description: "Manage portfolio projects shown on the public site",
@@ -82,6 +84,7 @@ export const resourceConfigs: ResourceConfig[] = [
   {
     key: "skills",
     endpoint: "/skills",
+    listEndpoint: "/skills/admin",
     arrayKey: "skills",
     title: "Skills",
     description: "Manage the skills taxonomy shown in the Skills section",
@@ -113,6 +116,7 @@ export const resourceConfigs: ResourceConfig[] = [
   {
     key: "experience",
     endpoint: "/experience",
+    listEndpoint: "/experience/admin",
     title: "Experience",
     description: "Work history shown on the About page timeline",
     createLabel: "New Experience",
@@ -138,6 +142,7 @@ export const resourceConfigs: ResourceConfig[] = [
   {
     key: "education",
     endpoint: "/education",
+    listEndpoint: "/education/admin",
     title: "Education",
     description: "Education entries on the About page timeline",
     createLabel: "New Education",
@@ -157,6 +162,7 @@ export const resourceConfigs: ResourceConfig[] = [
   {
     key: "certifications",
     endpoint: "/certifications",
+    listEndpoint: "/certifications/admin",
     title: "Certifications",
     description: "Certification gallery on the public site",
     createLabel: "New Certification",
@@ -176,6 +182,7 @@ export const resourceConfigs: ResourceConfig[] = [
   {
     key: "achievements",
     endpoint: "/achievements",
+    listEndpoint: "/achievements/admin",
     title: "Achievements",
     description: "Highlights shown in the Achievements grid",
     createLabel: "New Achievement",
@@ -199,6 +206,7 @@ export const resourceConfigs: ResourceConfig[] = [
   {
     key: "testimonials",
     endpoint: "/testimonials",
+    listEndpoint: "/testimonials/all",
     title: "Testimonials",
     description: "Approve and manage testimonials (only approved ones appear publicly)",
     createLabel: "New Testimonial",

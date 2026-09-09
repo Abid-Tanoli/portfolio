@@ -7,6 +7,7 @@ export interface ITestimonial extends Document {
   avatarUrl?: string;
   approved: boolean;
   order: number;
+  isVisible: boolean;
 }
 
 const TestimonialSchema: Schema = new Schema(
@@ -17,6 +18,7 @@ const TestimonialSchema: Schema = new Schema(
     avatarUrl: { type: String },
     approved: { type: Boolean, default: false },
     order: { type: Number, default: 0 },
+    isVisible: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

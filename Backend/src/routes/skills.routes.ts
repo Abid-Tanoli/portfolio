@@ -9,7 +9,7 @@ export const skillsRouter = Router();
 skillsRouter.get(
   "/",
   asyncHandler(async (_req: Request, res: Response) => {
-    const list = await Skill.find().sort({ order: 1, createdAt: 1 });
+    const list = await Skill.find({ isVisible: { $ne: false } }).sort({ order: 1, createdAt: 1 });
     
     // Taxonomy metadata for groups
     const categoriesMeta: Record<string, { title: string; description: string }> = {
@@ -38,6 +38,16 @@ skillsRouter.get(
   })
 );
 
+// GET /api/skills/admin (Protected list, including hidden records)
+skillsRouter.get(
+  "/admin",
+  requireAuth,
+  asyncHandler(async (_req: Request, res: Response) => {
+    const list = await Skill.find().sort({ order: 1, createdAt: 1 });
+    res.json({ skills: list });
+  })
+);
+
 // POST /api/skills (Protected)
 skillsRouter.post(
   "/",
@@ -46,6 +56,28 @@ skillsRouter.post(
     const item = new Skill(req.body);
     await item.save();
     res.status(201).json(item);
+  })
+);
+
+// PATCH /api/skills/:id/visibility (Protected)
+skillsRouter.patch(
+  "/:id/visibility",
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    if (typeof req.body?.isVisible !== "boolean") {
+      res.status(400).json({ error: "isVisible must be a boolean" });
+      return;
+    }
+    const item = await Skill.findByIdAndUpdate(
+      req.params.id,
+      { isVisible: req.body.isVisible },
+      { new: true, runValidators: true }
+    );
+    if (!item) {
+      res.status(404).json({ error: "Skill not found" });
+      return;
+    }
+    res.json(item);
   })
 );
 

@@ -212,6 +212,7 @@ function toPublicProject(project: any, repo?: RepoSummary) {
     links: project.links || [],
     startedAt: project.startedAt,
     isFeatured: Boolean(project.isFeatured),
+    isVisible: project.isVisible !== false,
     screenshotUrls: project.screenshotUrls || [],
     order: project.order ?? 0,
     language: repo?.language ?? null,
@@ -230,14 +231,17 @@ projectsRouter.get(
   asyncHandler(async (_req: Request, res: Response) => {
     let rawProjects: any[] = [];
     let usingFallback = false;
+    let canUseFallback = false;
 
     try {
-      rawProjects = await Project.find().sort({ order: 1, createdAt: -1 }).lean();
+      rawProjects = await Project.find({ isVisible: { $ne: false } }).sort({ order: 1, createdAt: -1 }).lean();
+      canUseFallback = !(await Project.exists());
     } catch (e) {
       console.warn("[projects] Error fetching projects from MongoDB, using fallback array");
+      canUseFallback = true;
     }
 
-    if (rawProjects.length === 0) {
+    if (rawProjects.length === 0 && canUseFallback) {
       // Fallback is ONLY for the public read-only list when the DB is down/empty.
       // Admin CRUD must never operate against these objects (they have no real _id).
       rawProjects = fallbackProjects;
@@ -265,14 +269,29 @@ projectsRouter.get(
   })
 );
 
+// GET /api/projects/admin (Protected list, including hidden records)
+projectsRouter.get(
+  "/admin",
+  requireAuth,
+  asyncHandler(async (_req: Request, res: Response) => {
+    const rawProjects = await Project.find().sort({ order: 1, createdAt: -1 }).lean();
+    res.json({
+      source: "database",
+      isFallback: false,
+      projects: rawProjects.map((project) => toPublicProject(project)),
+    });
+  })
+);
+
 // GET /api/projects/:slug (Public single)
 projectsRouter.get(
   "/:slug",
   asyncHandler(async (req: Request, res: Response) => {
     const { slug } = req.params;
-    let project = await Project.findOne({ slug }).lean();
+    const storedProject = await Project.findOne({ slug }).lean();
+    let project = storedProject?.isVisible === false ? null : storedProject;
 
-    if (!project) {
+    if (!storedProject) {
       const fallback = fallbackProjects.find((p) => p.slug === slug);
       if (!fallback) {
         res.status(404).json({ error: "Project not found" });
@@ -298,6 +317,32 @@ projectsRouter.post(
     const project = new Project(req.body);
     await project.save();
     res.status(201).json(project);
+  })
+);
+
+// PATCH /api/projects/:id/visibility (Protected)
+projectsRouter.patch(
+  "/:id/visibility",
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      res.status(400).json({ error: "Invalid project id" });
+      return;
+    }
+    if (typeof req.body?.isVisible !== "boolean") {
+      res.status(400).json({ error: "isVisible must be a boolean" });
+      return;
+    }
+    const project = await Project.findByIdAndUpdate(
+      req.params.id,
+      { isVisible: req.body.isVisible },
+      { new: true, runValidators: true }
+    );
+    if (!project) {
+      res.status(404).json({ error: "Project not found" });
+      return;
+    }
+    res.json(project);
   })
 );
 

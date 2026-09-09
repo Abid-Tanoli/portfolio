@@ -19,6 +19,7 @@ export interface IProject extends Document {
   links: IProjectLink[];
   startedAt: string;
   isFeatured: boolean;
+  isVisible: boolean;
   repoNames: string[];
   screenshotUrls: string[];
   order: number;
@@ -55,6 +56,7 @@ const ProjectSchema: Schema = new Schema(
       default: () => new Date().toISOString().slice(0, 10),
     },
     isFeatured: { type: Boolean, default: false },
+    isVisible: { type: Boolean, default: true },
     repoNames: [{ type: String }],
     screenshotUrls: [{ type: String }],
     order: { type: Number, default: 0 },

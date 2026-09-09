@@ -9,6 +9,16 @@ export const achievementsRouter = Router();
 achievementsRouter.get(
   "/",
   asyncHandler(async (_req: Request, res: Response) => {
+    const list = await Achievement.find({ isVisible: { $ne: false } }).sort({ order: 1, createdAt: -1 });
+    res.json(list);
+  })
+);
+
+// GET /api/achievements/admin (Protected list, including hidden records)
+achievementsRouter.get(
+  "/admin",
+  requireAuth,
+  asyncHandler(async (_req: Request, res: Response) => {
     const list = await Achievement.find().sort({ order: 1, createdAt: -1 });
     res.json(list);
   })
@@ -22,6 +32,28 @@ achievementsRouter.post(
     const item = new Achievement(req.body);
     await item.save();
     res.status(201).json(item);
+  })
+);
+
+// PATCH /api/achievements/:id/visibility (Protected)
+achievementsRouter.patch(
+  "/:id/visibility",
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    if (typeof req.body?.isVisible !== "boolean") {
+      res.status(400).json({ error: "isVisible must be a boolean" });
+      return;
+    }
+    const item = await Achievement.findByIdAndUpdate(
+      req.params.id,
+      { isVisible: req.body.isVisible },
+      { new: true, runValidators: true }
+    );
+    if (!item) {
+      res.status(404).json({ error: "Achievement not found" });
+      return;
+    }
+    res.json(item);
   })
 );
 
