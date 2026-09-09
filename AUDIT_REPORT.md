@@ -1,5 +1,7 @@
 # AUDIT_REPORT.md — Phase 0 audit of existing work
 
+> Superseded — this project is now deployed on a VPS; see DEPLOYMENT.md for the current setup.
+
 Audited 2026-08-04 against the master continuation prompt. Code on disk is the source of truth.
 
 ## Summary

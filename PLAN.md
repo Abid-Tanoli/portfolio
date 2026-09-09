@@ -1,5 +1,7 @@
 # PLAN.md — Portfolio Architecture
 
+> Superseded — this project is now deployed on a VPS; see DEPLOYMENT.md for the current setup.
+
 ## 0. Revised architecture (user decision, 2026-07-31)
 
 > **User requirement:** the portfolio project itself must follow the MERN-style pattern used in the author's existing work: a **React frontend** and a **Node.js + Express backend** — not a Next.js App Router monolith.

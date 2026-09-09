@@ -1,5 +1,7 @@
 ﻿# PROJECT_CHECKLIST.md - Living checklist
 
+> Superseded — this project is now deployed on a VPS; see DEPLOYMENT.md for the current setup.
+
 Status legend: `[ ]` pending | `[~]` in progress / partially verified | `[x]` done + verified.
 
 Last verification pass: 2026-08-04

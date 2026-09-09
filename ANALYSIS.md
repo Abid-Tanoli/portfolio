@@ -1,5 +1,7 @@
 # ANALYSIS.md — Phase 1 Findings
 
+> Superseded — this project is now deployed on a VPS; see DEPLOYMENT.md for the current setup.
+
 Live-source audit for the Abid Ali Tanoli portfolio. Data fetched on 2026-07-31 via the GitHub REST API (unauthenticated, 60 req/hr limit), plus attempted Vercel/Railway dashboard scrapes.
 
 ## 1. GitHub Profile
