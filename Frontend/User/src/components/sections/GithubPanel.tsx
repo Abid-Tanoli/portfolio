@@ -1,11 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Activity, Code2, GitCommitHorizontal, Star } from "lucide-react";
-import { fetchJson } from "@/lib/api";
 import type { GithubEventSummary, GithubRepoSummary, GithubUserSummary } from "@/types";
 import { profile } from "@/data/profile";
 import { projects as curatedProjects } from "@/data/projects";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatDate, timeAgo } from "@/lib/utils";
 
@@ -148,34 +146,16 @@ function ActivityHeatmap({ events }: { events: GithubEventSummary[] }) {
 }
 
 export function GithubPanel() {
-  const [user, setUser] = useState<GithubUserSummary | null>(null);
-  const [repos, setRepos] = useState<GithubRepoSummary[] | null>(null);
-  const [events, setEvents] = useState<GithubEventSummary[] | null>(null);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    if (window.__PRERENDER__) return;
-    let cancelled = false;
-    Promise.all([
-      fetchJson<GithubUserSummary>("/api/github/user"),
-      fetchJson<GithubRepoSummary[]>("/api/github/repos"),
-      fetchJson<GithubEventSummary[]>("/api/github/events"),
-    ])
-      .then(([u, r, e]) => {
-        if (!cancelled) {
-          setUser(u);
-          setRepos(r);
-          setEvents(e);
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setLoaded(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const user: GithubUserSummary = {
+    login: profile.githubUsername,
+    name: profile.name,
+    public_repos: curatedProjects.length,
+    followers: 0,
+    following: 0,
+    created_at: "2024-06-21T00:00:00Z",
+  };
+  const repos = staticRepos();
+  const events: GithubEventSummary[] = [];
 
   const topRepos = useMemo(() => {
     if (!repos) return [];
@@ -189,27 +169,9 @@ export function GithubPanel() {
       .slice(0, 4);
   }, [repos]);
 
-  if (!window.__PRERENDER__ && !user && !loaded) {
-    return (
-      <div className="grid gap-5 lg:grid-cols-3">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-44 rounded-xl" />
-        ))}
-      </div>
-    );
-  }
-
-  const fallbackRepos = !repos ? staticRepos() : repos;
+  const fallbackRepos = repos;
   const stars = fallbackRepos.reduce((a, r) => a + r.stars, 0);
-
-  const renderedUser = user ?? {
-    login: profile.githubUsername,
-    name: profile.name,
-    public_repos: fallbackRepos.length,
-    followers: 0,
-    following: 0,
-    created_at: "2024-06-21T00:00:00Z",
-  };
+  const renderedUser = user;
 
   return (
     <div className="flex flex-col gap-5">
@@ -300,17 +262,15 @@ export function GithubPanel() {
         </ScrollReveal>
       </div>
 
-      {repos ? (
-        <ScrollReveal delay={0.1}>
+      <ScrollReveal delay={0.1}>
           <div className="glass-card flex flex-col gap-4 rounded-xl p-6">
             <h3 className="flex items-center gap-2 font-display text-base font-semibold">
               <Activity className="h-4 w-4 text-primary" />
               Recent Activity
             </h3>
-            {events ? <ActivityHeatmap events={events} /> : <Skeleton className="h-24 w-full" />}
+            <ActivityHeatmap events={events} />
           </div>
-        </ScrollReveal>
-      ) : null}
+      </ScrollReveal>
 
       {events && events.length > 0 ? (
         <ScrollReveal delay={0.15}>
@@ -342,7 +302,7 @@ export function GithubPanel() {
       ) : null}
 
       <p className="text-center font-mono text-[11px] text-muted-foreground">
-        Stats sourced from the GitHub REST API via the portfolio backend ·{" "}
+        Curated repository snapshots from the static portfolio data ·{" "}
         {formatDate(renderedUser.created_at)} account
       </p>
     </div>

@@ -1,8 +1,8 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import { GitHubIcon, LinkedInIcon } from "@/components/shared/icons";
-import type { PortfolioProfile } from "@/context/PortfolioContext";
+import type { Profile } from "@/types";
 
-export function buildSocials(profile: PortfolioProfile) {
+export function buildSocials(profile: Profile) {
   return [
     { label: "GitHub", href: profile.github, icon: GitHubIcon },
     {
@@ -15,7 +15,7 @@ export function buildSocials(profile: PortfolioProfile) {
   ];
 }
 
-export function buildContactRail(profile: PortfolioProfile) {
+export function buildContactRail(profile: Profile) {
   return [
     {
       label: "Email",

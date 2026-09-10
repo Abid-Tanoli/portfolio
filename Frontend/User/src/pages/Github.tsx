@@ -16,7 +16,7 @@ export default function Github() {
         as="h1"
         eyebrow="GitHub"
         title="Code, live and honest"
-        description="Real data from the GitHub REST API, cached by the backend so it never rate-limits."
+        description="A static snapshot of my repositories, technologies, and development activity."
       />
       <GithubPanel />
     </section>

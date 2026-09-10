@@ -1,22 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Download, FileText } from "lucide-react";
-import { fetchJson } from "@/lib/api";
+import { profile } from "@/data/profile";
 import { useSeo } from "@/lib/seo";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { Button } from "@/components/ui/button";
 
-const FALLBACK_RESUME_URL = import.meta.env.VITE_RESUME_URL ?? "";
-
-interface ApiProfile {
-  resumeUrl?: string;
-  name?: string;
-  [key: string]: unknown;
-}
-
 export default function Resume() {
-  const [resumeUrl, setResumeUrl] = useState(FALLBACK_RESUME_URL);
-  const [name, setName] = useState("");
-  const [loaded, setLoaded] = useState(false);
+  const resumeUrl = profile.resumeUrl;
+  const name = profile.name;
   const [iframeError, setIframeError] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -31,30 +22,6 @@ export default function Resume() {
   // - there is no resume URL yet
   // - the iframe failed to load the PDF
   const showPdfFallback = window.__PRERENDER__ || iframeError || !resumeUrl;
-
-  useEffect(() => {
-    if (window.__PRERENDER__) return;
-    let cancelled = false;
-    fetchJson<ApiProfile>("/api/profile", 0)
-      .then((data) => {
-        if (cancelled) return;
-        if (typeof data?.resumeUrl === "string" && data.resumeUrl) {
-          setResumeUrl(data.resumeUrl);
-        }
-        if (typeof data?.name === "string" && data.name) {
-          setName(data.name);
-        }
-      })
-      .catch(() => {
-        /* backend unreachable — keep local fallback */
-      })
-      .finally(() => {
-        if (!cancelled) setLoaded(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
@@ -92,11 +59,6 @@ export default function Resume() {
                 Open PDF in new tab
               </a>
             )}
-          </div>
-        ) : !loaded ? (
-          /* Loading skeleton */
-          <div className="flex h-[75vh] w-full items-center justify-center rounded-xl border border-card-border bg-white">
-            <FileText className="h-10 w-10 animate-pulse text-muted-foreground" />
           </div>
         ) : (
           /*
