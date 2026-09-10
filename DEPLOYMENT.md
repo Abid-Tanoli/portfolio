@@ -1,109 +1,67 @@
-# Deployment Runbook
+# Static Deployment Runbook
 
-This project is deployed on one VPS. Nginx serves both Vite builds and reverse-proxies `/api/` to the Node.js backend. PM2 keeps the backend process running after deploys and reboots.
+The portfolio is now a fully static Vite site. Nginx serves `Frontend/User/dist`; there is no backend, database, admin panel, PM2 process, API proxy, or Node process in production.
 
 ## Server prerequisites
 
-Install Node.js (the version supported by the lockfiles), npm, PM2, and Nginx. The backend uses Puppeteer for PDF generation, so install Chromium's runtime libraries on Ubuntu/Debian as well:
+Install only Git, Node.js/npm for the build, and Nginx:
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y nginx libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
-  libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
-  libgbm1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libcairo2 \
-  libatspi2.0-0 libgtk-3-0 fonts-liberation
-npm install --global pm2
+sudo apt-get install -y nginx git
 ```
 
-Clone the repository on the VPS, install dependencies in `Backend`, `Frontend/User`, and `Frontend/admin`, and create `Backend/.env` from `Backend/.env.example`.
+Clone the repository on the VPS. The only frontend environment values required at build time are `VITE_SITE_URL` and the three `VITE_EMAILJS_*` values documented in `Frontend/User/.env.example`.
 
-## Required backend environment
+## Nginx configuration
 
-Set these variables in `Backend/.env`:
-
-| Variable | Purpose |
-| --- | --- |
-| `PORT` | Internal backend port, normally `4000`; Nginx proxies to this port. |
-| `MONGO_URI` | MongoDB connection string. |
-| `JWT_SECRET` | Strong secret used to sign admin sessions. |
-| `ADMIN_INITIAL_EMAIL` | Initial admin email. |
-| `ADMIN_INITIAL_PASSWORD` | Initial admin password, changed after first login. |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name. |
-| `CLOUDINARY_API_KEY` | Cloudinary API key. |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret. |
-| `CORS_ORIGINS` | Comma-separated exact frontend origins served by Nginx, including the real VPS origin. |
-| `GITHUB_TOKEN` | Optional GitHub API token. |
-| `SMTP_HOST` | Optional SMTP host for contact forwarding. |
-| `SMTP_PORT` | Optional SMTP port, usually `587`. |
-| `SMTP_SECURE` | Optional `true` for port 465, otherwise `false`. |
-| `SMTP_USER` | Optional SMTP username. |
-| `SMTP_PASS` | Optional SMTP password. |
-| `SMTP_FROM` | Optional sender address. |
-| `CONTACT_TO` | Destination address for contact messages. |
-
-`NODE_ENV=production` should also be set on the VPS. `CLOUDINARY_URL` may be set when preferred by the Cloudinary tooling, but the three explicit Cloudinary variables above are the application contract.
-
-## Nginx layout
-
-Build both frontend applications. Use one server block for the public domain (replace paths and domain names with the VPS values):
+Replace `your-domain.com` and the repository path as needed. This is the complete server block; it has no `/api/` proxy and no `/admin/` location:
 
 ```nginx
 server {
-	listen 80;
-	server_name your-domain.com;
+    listen 80;
+    server_name your-domain.com;
 
-	root /srv/portfolio/Frontend/User/dist;
-	index index.html;
+    root /var/www/portfolio/Frontend/User/dist;
+    index index.html;
 
-	location /api/ {
-		proxy_pass http://127.0.0.1:4000;
-		proxy_http_version 1.1;
-		proxy_set_header Host $host;
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto $scheme;
-	}
-
-	location /admin/ {
-		alias /srv/portfolio/Frontend/admin/dist/;
-		try_files $uri $uri/ /admin/index.html;
-	}
-
-	location / {
-		try_files $uri $uri/ /index.html;
-	}
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
 }
 ```
 
-The `/` fallback serves User SPA routes, `/admin/` fallback serves Admin SPA routes, and `/api/` is never handled by a frontend. Test the config with `sudo nginx -t`, then reload with `sudo systemctl reload nginx`. Configure HTTPS separately with Certbot if the domain is available.
-
-## Build, start, and deploy
-
-The `deploy.sh` pattern is intentionally simple: pull the selected revision, install dependencies, build both frontends and the backend, then reload the PM2 process and Nginx. Run it from the repository root, or keep the equivalent commands in the server's deployment script:
+Apply and test it with:
 
 ```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-git pull --ff-only
-npm ci --prefix Backend
-npm ci --prefix Frontend/User
-npm ci --prefix Frontend/admin
-npm run build --prefix Backend
-npm run build --prefix Frontend/User
-npm run build --prefix Frontend/admin
-pm2 restart portfolio-backend --update-env || pm2 start Backend/dist/index.js --name portfolio-backend
-pm2 save
+sudo nano /etc/nginx/sites-available/portfolio
+sudo ln -sfn /etc/nginx/sites-available/portfolio /etc/nginx/sites-enabled/portfolio
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-The backend build outputs `Backend/dist/index.js`; the two frontend builds output their respective `dist` directories. Check logs with `pm2 logs portfolio-backend` and verify `GET https://your-domain.com/api/health` after each deployment.
+Configure HTTPS separately with Certbot if needed.
+
+## Build and deploy
+
+Use the root `deploy.sh` from `/var/www/portfolio`:
+
+```bash
+bash /var/www/portfolio/deploy.sh
+```
+
+There is no production Node process to start or restart. After the new static site is confirmed working, it is safe to remove the old PM2 entry:
+
+```bash
+pm2 delete portfolio-backend
+pm2 save
+```
 
 ## Live verification checklist
 
-1. Open the public site and an Admin route such as `/admin/login`.
-2. Log in and edit a project or profile field; confirm it appears on the public site.
-3. Regenerate the resume in Admin and verify the `/resume` route.
-4. Submit the contact form and verify the message appears in Admin.
-5. Confirm `GET /api/health` reports the expected database status.
+1. Pull the latest repository on the VPS.
+2. Run the static build and confirm `Frontend/User/dist` exists.
+3. Run `sudo nginx -t`, then reload Nginx.
+4. Visit the public site and test `/`, `/about`, `/projects`, `/resume`, and `/contact`.
+5. After configuring EmailJS, submit one contact message and confirm delivery.
+6. Remove `portfolio-backend` from PM2 only after the static site is working.
