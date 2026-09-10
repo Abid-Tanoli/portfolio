@@ -8,6 +8,10 @@ export interface Experience {
   kind: RoleKind;
   summary: string;
   highlights: string[];
+  order?: number;
+  isVisible?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Education {
@@ -16,4 +20,8 @@ export interface Education {
   institution: string;
   period: string;
   note?: string;
+  order?: number;
+  isVisible?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }

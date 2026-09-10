@@ -4,6 +4,65 @@ export interface Certification {
   issuer: string;
   batch: string;
   credential?: string;
+  imageUrl?: string;
+  order?: number;
+  isVisible?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Profile {
+  id?: string;
+  name: string;
+  firstName: string;
+  title: string;
+  tagline: string;
+  email: string;
+  phone: string;
+  phoneDisplay: string;
+  location: string;
+  github: string;
+  githubUsername: string;
+  linkedin: string;
+  linkedinPending: boolean;
+  resumeUrl: string;
+  resumeSummary: string;
+  resumeUpdatedAt?: string;
+  profilePictureUrl: string;
+  heroSublines: string[];
+  heroSummary: string;
+  aboutSummary: string[];
+  careerGoals: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Skill {
+  id: string;
+  name: string;
+  category: "frontend" | "backend" | "ai" | "deployment" | "tools";
+  icon?: string;
+  order: number;
+  isVisible?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SkillExportGroup extends SkillGroup {
+  records: Skill[];
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  quote: string;
+  avatarUrl?: string;
+  approved?: boolean;
+  order?: number;
+  isVisible?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type { Experience, Education } from "./experience";

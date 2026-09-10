@@ -6,6 +6,7 @@ export interface ProjectLink {
 }
 
 export interface Project {
+  id?: string;
   slug: string;
   name: string;
   tagline: string;
@@ -19,6 +20,12 @@ export interface Project {
   links: ProjectLink[];
   startedAt: string;
   isFeatured: boolean;
+  repoNames?: string[];
+  screenshotUrls?: string[];
+  order?: number;
+  isVisible?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface EnrichedProject extends Project {
