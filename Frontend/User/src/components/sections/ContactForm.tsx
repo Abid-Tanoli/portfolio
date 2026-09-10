@@ -1,4 +1,5 @@
 import { useState } from "react";
+import emailjs from "@emailjs/browser";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,7 +27,9 @@ type SubmitState =
   | { status: "success" }
   | { status: "error"; message: string };
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 export function ContactForm() {
   const { profile } = usePortfolio();
@@ -44,23 +47,22 @@ export function ContactForm() {
 
   const onSubmit = async (values: ContactValues) => {
     setSubmitState({ status: "sending" });
-    try {
-      const res = await fetch(`${API_BASE}/api/contact`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+      setSubmitState({
+        status: "error",
+        message: "Contact form is not configured yet. Please email me directly instead.",
       });
-      const data = (await res.json()) as { error?: string };
-      if (!res.ok) {
-        setSubmitState({ status: "error", message: data.error ?? "Something went wrong. Please try again." });
-        return;
-      }
+      return;
+    }
+
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, values, EMAILJS_PUBLIC_KEY);
       setSubmitState({ status: "success" });
       reset();
     } catch {
       setSubmitState({
         status: "error",
-        message: "Network error — please check your connection and try again.",
+        message: "Message could not be sent. Please try again or email me directly.",
       });
     }
   };
