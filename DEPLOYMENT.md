@@ -15,12 +15,12 @@ Clone the repository on the VPS. The only frontend environment values required a
 
 ## Nginx configuration
 
-Replace `your-domain.com` and the repository path as needed. This is the complete server block; it has no `/api/` proxy and no `/admin/` location:
+Replace the repository path as needed. This is the complete server block; it has no `/api/` proxy and no `/admin/` location:
 
 ```nginx
 server {
-    listen 80;
-    server_name your-domain.com;
+    listen 8080;
+    server_name 187.127.96.220;
 
     root /var/www/portfolio/Frontend/User/dist;
     index index.html;

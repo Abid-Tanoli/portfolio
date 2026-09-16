@@ -1,32 +1,63 @@
-# React + TypeScript + Vite
+# Portfolio — Frontend (Static)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A fully static personal portfolio site built with React, TypeScript, and Vite. No backend, no database, no admin panel — all data lives in `src/data/` as typed TypeScript modules exported from the original CMS.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** + **TypeScript** + **Vite 6**
+- **Tailwind CSS v4** (via `@tailwindcss/vite`)
+- **React Router v7** (SPA routing)
+- **EmailJS** — contact form (browser-side, no backend required)
+- **Zod** + **react-hook-form** — form validation
+- **Puppeteer** — prerendering and smoke tests (build tooling only)
 
-## React Compiler
+## Data layer
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+All portfolio data is static in `src/data/`:
 
-## Expanding the Oxlint configuration
+| File | Records | Source |
+|------|---------|--------|
+| `profile.ts` | 1 | Single profile object |
+| `experience.ts` | 4 | Work history |
+| `education.ts` | 2 | Degrees |
+| `skills.ts` | 30 skills / 5 groups | Categorized skill taxonomy |
+| `certifications.ts` | 5 | Courses and certificates |
+| `achievements.ts` | 5 | Milestone highlights |
+| `projects.ts` | 8 | Portfolio projects (3 featured) |
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Getting started
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install          # install dependencies
+npm run predev       # copy assets from content/ to public/
+npm run dev          # start dev server on http://localhost:5173
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Build and deploy
+
+```bash
+npm run build        # tsc -b && vite build (+ prerender)
+```
+
+Output goes to `dist/`. Serve with any static file server; Nginx with `try_files $uri $uri/ /index.html` is recommended.
+
+### Environment variables
+
+| Variable | Purpose | Required |
+|----------|---------|----------|
+| `VITE_SITE_URL` | Public site URL (OG meta + sitemap) | Yes |
+| `VITE_EMAILJS_SERVICE_ID` | EmailJS service ID | For contact form |
+| `VITE_EMAILJS_TEMPLATE_ID` | EmailJS template ID | For contact form |
+| `VITE_EMAILJS_PUBLIC_KEY` | EmailJS public key | For contact form |
+
+Copy `.env.example` to `.env` and fill in the values.
+
+## Available scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Vite dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview the production build |
+| `npm run smoke` | Headless smoke test against built site |
+| `npm run portfolio` | Regenerate `content/portfolio.pdf` |

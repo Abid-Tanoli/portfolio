@@ -7,6 +7,6 @@ dist
 .DS_Store
 Thumbs.db
 .vercel
-Frontend/public/resume.pdf
-Frontend/public/content/images/
+Frontend/User/public/Portfolio.pdf
+Frontend/User/public/content/images/
 
