@@ -1,4 +1,4 @@
-﻿import { existsSync } from "node:fs";
+import { existsSync } from "node:fs";
 import puppeteer from "puppeteer-core";
 
 const BASE = process.argv[2] ?? "http://localhost:5173";
@@ -47,7 +47,7 @@ for (const route of ROUTES) {
     await new Promise((r) => setTimeout(r, 800));
     const title = await page.title();
     const h1 = await page.evaluate(() => document.querySelector("h1")?.textContent?.trim() ?? "(none)");
-    const hasError = errors.filter((e) => !e.includes("favicon") && !e.includes("vite:") && !e.includes("Warning: React") && !(e.includes("/resume.pdf") && e.includes("ERR_ABORTED")));
+    const hasError = errors.filter((e) => !e.includes("favicon") && !e.includes("vite:") && !e.includes("Warning: React"));
     if (hasError.length > 0) {
       failures++;
       console.log(`\n=== FAIL ${route} ===`);

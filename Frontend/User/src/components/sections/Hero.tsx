@@ -8,25 +8,28 @@ import { GradientBlob } from "@/components/shared/GradientBlob";
 import { UploadableImage } from "@/components/shared/UploadableImage";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
+const FALLBACK_SUBLINE = "Full Stack Web Developer (MERN)";
+
 function useTypewriter(words: string[]) {
+  const safeWords = words.length > 0 ? words : [FALLBACK_SUBLINE];
   const [index, setIndex] = useState(0);
-  const [text, setText] = useState(() => words[0]);
+  const [text, setText] = useState(() => safeWords[0]);
   const [deleting, setDeleting] = useState(false);
   const [started, setStarted] = useState(false);
   const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
     if (reduced || window.__PRERENDER__) {
-      setText(words[0]);
+      setText(safeWords[0]);
       return;
     }
     const t = setTimeout(() => setStarted(true), 900);
     return () => clearTimeout(t);
-  }, [reduced, words]);
+  }, [reduced, safeWords]);
 
   useEffect(() => {
     if (reduced || !started) return;
-    const word = words[index % words.length];
+    const word = safeWords[index % safeWords.length];
     const timeout = setTimeout(
       () => {
         if (!deleting) {
@@ -40,14 +43,14 @@ function useTypewriter(words: string[]) {
             setText(word.slice(0, text.length - 1));
           } else {
             setDeleting(false);
-            setIndex((i) => (i + 1) % words.length);
+            setIndex((i) => (i + 1) % safeWords.length);
           }
         }
       },
       deleting ? 35 : 70
     );
     return () => clearTimeout(timeout);
-  }, [text, deleting, index, words, reduced, started]);
+  }, [text, deleting, index, safeWords, reduced, started]);
 
   return text;
 }
@@ -146,10 +149,10 @@ export function Hero() {
               </Link>
             </Button>
             <Button variant="secondary" size="lg" asChild>
-              <a href={profile.resumeUrl || "/resume.pdf"} download="Abid-Ali-Tanoli-Resume.pdf">
+              <Link to="/resume">
                 <Download className="h-4 w-4" />
-                Download Resume
-              </a>
+                View Resume
+              </Link>
             </Button>
             <Button variant="ghost" size="lg" asChild>
               <Link to="/contact">

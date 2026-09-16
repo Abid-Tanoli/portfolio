@@ -13,10 +13,15 @@ export const profile: Profile = {
   "githubUsername": "Abid-Tanoli",
   "linkedin": "",
   "linkedinPending": true,
-  "resumeUrl": "https://res.cloudinary.com/miiqsgaj/image/upload/v1788958855/resume/Abid-Ali-Tanoli-Resume.pdf",
+  "resumeUrl": "/resume",
   "resumeSummary": "Full Stack Web Developer with hands-on MERN expertise (MongoDB, Express.js, React.js, Node.js) and a growing specialization in AI-augmented development - integrating tools such as Antigravity, OpenAI Codex, Qwen, and OpenCode into real production workflows. Currently an intern at Bano Qabil Incubation Center, building BQ-PLAY, a live cricket scoring platform with real-time updates. A complementary 10+ year background in Accounting & Finance - including receivable management supervision - brings analytical rigor, structured problem-solving, and financial reporting discipline to every engineering decision.",
   "profilePictureUrl": "https://res.cloudinary.com/miiqsgaj/image/upload/v1787847211/profile/e2e-profile-1787847201252.png",
-  "heroSublines": [],
+  "heroSublines": [
+    "MERN Stack Developer",
+    "AI-Augmented Development",
+    "REST API Design",
+    "Financial Analysis"
+  ],
   "heroSummary": "Full Stack Web Developer building real products with the MERN stack - and a growing specialization in AI-augmented development, using tools like Antigravity, Codex, Qwen, and OpenCode to ship faster and smarter. Currently building BQ-PLAY, a live cricket scoring platform, at Bano Qabil Incubation Center.",
   "aboutSummary": [
     "I'm a Full Stack Web Developer with hands-on MERN expertise - MongoDB, Express.js, React.js, and Node.js - and a fast-growing specialization in AI-augmented development. I integrate modern AI coding tools (Antigravity, OpenAI Codex, Qwen, OpenCode) directly into my workflow to design, build, and debug features faster without compromising quality.",

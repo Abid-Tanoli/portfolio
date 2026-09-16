@@ -10,7 +10,6 @@
     "preview": "vite preview",
     "prebuild": "node scripts/copy-assets.mjs",
     "postbuild": "node scripts/prerender.mjs",
-    "resume": "node scripts/render-resume.mjs",
     "portfolio": "node scripts/render-portfolio.mjs",
     "smoke": "node scripts/smoke.mjs",
     "predev": "node scripts/copy-assets.mjs"

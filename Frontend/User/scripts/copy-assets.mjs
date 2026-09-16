@@ -1,18 +1,11 @@
-﻿import { copyFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const frontendRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
-const repoRoot = join(frontendRoot, "..");
+const repoRoot = join(frontendRoot, "..", "..");
 const contentDir = join(repoRoot, "content");
 const publicDir = join(frontendRoot, "public");
-
-const contentResume = join(contentDir, "resume.pdf");
-const publicResume = join(publicDir, "resume.pdf");
-if (existsSync(contentResume)) {
-  copyFileSync(contentResume, publicResume);
-  console.log(`[copy-assets] copied ${contentResume} -> ${publicResume}`);
-}
 
 const contentPortfolio = join(contentDir, "portfolio.pdf");
 const publicPortfolio = join(publicDir, "Portfolio.pdf");
