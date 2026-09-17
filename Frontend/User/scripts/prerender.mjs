@@ -36,8 +36,8 @@ function findBrowser() {
 }
 
 // Fall back to plain client-side rendering (copy dist/index.html to each route)
-// so Vercel's vercel.json rewrites still resolve and the build never crashes
-// just because no headless browser could be found or launched.
+// so the SPA still works on deep links even when no headless browser could be
+// found or launched, and the build never crashes because of it.
 async function copySpaFallback() {
   const spa = path.join(DIST, "index.html");
   if (!existsSync(spa)) throw new Error("dist/index.html missing — run `npm run build` first");

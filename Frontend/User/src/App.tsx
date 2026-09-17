@@ -5,6 +5,7 @@ import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PortfolioProvider } from "@/context/PortfolioContext";
 import { usePortfolio } from "@/context/PortfolioContext";
+import { SITE_URL } from "@/lib/constants";
 
 function LazyBoundary({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
@@ -105,7 +106,7 @@ function JsonLd() {
     email: `mailto:${profile.email}`,
     telephone: profile.phone,
     address: { "@type": "PostalAddress", addressLocality: "Karachi", addressCountry: "PK" },
-    url: "https://abidtanoli.vercel.app",
+    url: SITE_URL,
     sameAs: [profile.github, profile.linkedin].filter(Boolean),
     knowsAbout: [
       "MERN Stack",
