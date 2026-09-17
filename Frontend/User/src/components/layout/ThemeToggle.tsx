@@ -8,8 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const { resolvedDark, setTheme } = useTheme();
 
   return (
     <Tooltip>
@@ -17,13 +16,13 @@ export function ThemeToggle() {
         <Button
           variant="ghost"
           size="icon"
-          aria-label={`Switch to ${isDark ? "light" : "dark"} theme`}
-          onClick={() => setTheme(isDark ? "light" : "dark")}
+          aria-label={`Switch to ${resolvedDark ? "light" : "dark"} theme`}
+          onClick={() => setTheme(resolvedDark ? "light" : "dark")}
         >
-          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {resolvedDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{isDark ? "Light mode" : "Dark mode"}</TooltipContent>
+      <TooltipContent>{resolvedDark ? "Light mode" : "Dark mode"}</TooltipContent>
     </Tooltip>
   );
 }

@@ -19,12 +19,21 @@ export function useTheme() {
     return "system";
   });
 
+  const [resolvedDark, setResolvedDark] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  });
+
   useEffect(() => {
     const root = document.documentElement;
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const apply = () => {
       const dark = theme === "dark" || (theme === "system" && mq.matches);
       root.classList.toggle("dark", dark);
+      setResolvedDark(dark);
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute("content", dark ? "#08090b" : "#fafafa");
     };
     apply();
     localStorage.setItem("theme", theme);
@@ -32,5 +41,5 @@ export function useTheme() {
     return () => mq.removeEventListener("change", apply);
   }, [theme]);
 
-  return { theme, setTheme };
+  return { theme, setTheme, resolvedDark };
 }
