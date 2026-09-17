@@ -4,7 +4,7 @@ A fully static personal portfolio site built with React, TypeScript, and Vite. N
 
 ## Stack
 
-- **React 19** + **TypeScript** + **Vite 6**
+- **React 19** + **TypeScript** + **Vite**
 - **Tailwind CSS v4** (via `@tailwindcss/vite`)
 - **React Router v7** (SPA routing)
 - **EmailJS** — contact form (browser-side, no backend required)
@@ -29,28 +29,30 @@ All portfolio data is static in `src/data/`:
 
 ```bash
 npm install          # install dependencies
-npm run predev       # copy assets from content/ to public/
 npm run dev          # start dev server on http://localhost:5173
 ```
+
+Copy `.env.example` to `.env` and fill in the values (see "Environment variables" below).
 
 ## Build and deploy
 
 ```bash
-npm run build        # tsc -b && vite build (+ prerender)
+npm run build        # generate SEO files → tsc -b → vite build (+ prerender)
 ```
 
 Output goes to `dist/`. Serve with any static file server; Nginx with `try_files $uri $uri/ /index.html` is recommended.
+
+`robots.txt` and `sitemap.xml` are generated into `public/` on every build (and dev start)
+by `scripts/generate-seo.mjs` from the `VITE_SITE_URL` variable — do not edit them by hand.
 
 ### Environment variables
 
 | Variable | Purpose | Required |
 |----------|---------|----------|
-| `VITE_SITE_URL` | Public site URL (OG meta + sitemap) | Yes |
+| `VITE_SITE_URL` | Public site URL (OG/canonical meta + sitemap/robots) | Yes |
 | `VITE_EMAILJS_SERVICE_ID` | EmailJS service ID | For contact form |
 | `VITE_EMAILJS_TEMPLATE_ID` | EmailJS template ID | For contact form |
 | `VITE_EMAILJS_PUBLIC_KEY` | EmailJS public key | For contact form |
-
-Copy `.env.example` to `.env` and fill in the values.
 
 ## Available scripts
 
@@ -60,4 +62,3 @@ Copy `.env.example` to `.env` and fill in the values.
 | `npm run build` | Production build |
 | `npm run preview` | Preview the production build |
 | `npm run smoke` | Headless smoke test against built site |
-| `npm run portfolio` | Regenerate `content/portfolio.pdf` |

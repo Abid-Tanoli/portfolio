@@ -8,6 +8,8 @@ export const navLinks = [
   { label: "Contact", to: "/contact" },
 ];
 
+export const PROFILE_IMAGE_PATH = "/content/images/profile.jpg";
+
 export const SITE_NAME = "Abid Ali Tanoli";
 export const SITE_TITLE = "Abid Ali Tanoli — Full Stack MERN Developer";
 export const SITE_DESCRIPTION =

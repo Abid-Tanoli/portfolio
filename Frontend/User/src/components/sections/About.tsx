@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Target } from "lucide-react";
 import { usePortfolio } from "@/context/PortfolioContext";
+import { PROFILE_IMAGE_PATH } from "@/lib/constants";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { UploadableImage } from "@/components/shared/UploadableImage";
+import { StaticImage } from "@/components/shared/StaticImage";
 
 export function About() {
   const { profile, aboutSummary, careerGoals, skillGroups } = usePortfolio();
@@ -19,12 +20,12 @@ export function About() {
 
       <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
         <ScrollReveal className="mx-auto w-full max-w-sm lg:max-w-none">
-          <UploadableImage
-            slot="profile"
-            id="about"
+          <StaticImage
+            src={PROFILE_IMAGE_PATH}
             alt={`Portrait of ${profile.name}`}
+            initials="AT"
+            fallbackLabel="Photograph coming soon"
             className="aspect-[4/5] w-full rounded-2xl border border-card-border shadow-lg"
-            fallbackLabel="Drop your photo at content/images/profile.jpg"
           />
         </ScrollReveal>
 

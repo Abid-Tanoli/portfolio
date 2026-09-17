@@ -6,7 +6,7 @@ import { useSeo } from "@/lib/seo";
 import { useEnrichedProjects } from "@/hooks/useEnrichedProjects";
 import { ProjectBadges } from "@/components/project/ProjectBadges";
 import { TechStackPills } from "@/components/project/TechStackPills";
-import { UploadableImage } from "@/components/shared/UploadableImage";
+import { StaticImage } from "@/components/shared/StaticImage";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
@@ -61,10 +61,11 @@ export default function ProjectDetail() {
       </ScrollReveal>
 
       <ScrollReveal delay={0.1}>
-        <UploadableImage
-          slot="project"
-          id={`${project.slug}.png`}
-          alt={`${project.name} — project screenshot placeholder`}
+        <StaticImage
+          src={project.screenshotUrls?.[0]}
+          alt={`${project.name} — project screenshot`}
+          initials={project.name.slice(0, 2).toUpperCase()}
+          fallbackLabel="Screenshot coming soon"
           className="mt-8 aspect-[16/9] w-full rounded-2xl border border-card-border shadow-lg"
         />
       </ScrollReveal>

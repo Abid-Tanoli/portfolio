@@ -1,21 +1,37 @@
 # Static Deployment Runbook
 
-The portfolio is now a fully static Vite site. Nginx serves `Frontend/User/dist`; there is no backend, database, admin panel, PM2 process, API proxy, or Node process in production.
+The portfolio is a fully static Vite site. Nginx serves `Frontend/User/dist`; there is
+no backend process, database, or admin panel in production.
 
-## Server prerequisites
+## Prerequisites on the VPS
 
-Install only Git, Node.js/npm for the build, and Nginx:
+Install Git, Node.js/npm (build only), and Nginx:
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y nginx git
 ```
 
-Clone the repository on the VPS. The only frontend environment values required at build time are `VITE_SITE_URL` and the three `VITE_EMAILJS_*` values documented in `Frontend/User/.env.example`.
+## Environment variables
+
+The build needs these values (documented in `Frontend/User/.env.example`). They are
+read at **build time**; the production bundle and `robots.txt`/`sitemap.xml` are baked
+with them, so there is no server-side config.
+
+| Variable | Purpose | Required |
+|----------|---------|----------|
+| `VITE_SITE_URL` | Public site URL — used for canonical/OG meta and generated `sitemap.xml`/`robots.txt` | Yes |
+| `VITE_EMAILJS_SERVICE_ID` | EmailJS service ID (contact form) | For the contact form |
+| `VITE_EMAILJS_TEMPLATE_ID` | EmailJS template ID | For the contact form |
+| `VITE_EMAILJS_PUBLIC_KEY` | EmailJS public key | For the contact form |
+
+If `VITE_SITE_URL` is not set at build time, the build falls back to the current host
+(`http://187.127.96.220:8080`). Point `VITE_SITE_URL` at the real domain once one is
+configured, then rebuild.
 
 ## Nginx configuration
 
-Replace the repository path as needed. This is the complete server block; it has no `/api/` proxy and no `/admin/` location:
+This server block is complete — no `/api/` proxy, no `/admin/` location:
 
 ```nginx
 server {
@@ -31,7 +47,7 @@ server {
 }
 ```
 
-Apply and test it with:
+Install it and check the config:
 
 ```bash
 sudo nano /etc/nginx/sites-available/portfolio
@@ -40,28 +56,24 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-Configure HTTPS separately with Certbot if needed.
+HTTPS can be added separately with Certbot once a real domain is in place.
 
 ## Build and deploy
 
-Use the root `deploy.sh` from `/var/www/portfolio`:
+From `/var/www/portfolio`:
 
 ```bash
 bash /var/www/portfolio/deploy.sh
 ```
 
-There is no production Node process to start or restart. After the new static site is confirmed working, it is safe to remove the old PM2 entry:
+`deploy.sh` pulls the latest code, installs dependencies, runs `npm run build` inside
+`Frontend/User` (which includes prerendering and SEO file generation), and reloads
+Nginx. There is no server process to start or restart.
 
-```bash
-pm2 delete portfolio-backend
-pm2 save
-```
+## Verify after deploy
 
-## Live verification checklist
-
-1. Pull the latest repository on the VPS.
-2. Run the static build and confirm `Frontend/User/dist` exists.
-3. Run `sudo nginx -t`, then reload Nginx.
-4. Visit the public site and test `/`, `/about`, `/projects`, `/resume`, and `/contact`.
-5. After configuring EmailJS, submit one contact message and confirm delivery.
-6. Remove `portfolio-backend` from PM2 only after the static site is working.
+1. `git pull` completed and `Frontend/User/dist` exists after the build.
+2. `sudo nginx -t` passes and Nginx has been reloaded.
+3. Visit `/`, `/about`, `/projects`, `/resume`, `/contact`, and `/github` from a browser.
+4. Submit one contact message and confirm delivery (EmailJS configured).
+5. Confirm `sitemap.xml` and `robots.txt` reference the live `VITE_SITE_URL`.

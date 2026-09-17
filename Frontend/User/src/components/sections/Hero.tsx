@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Download, MessageCircle, MapPin } from "lucide-react";
 import { usePortfolio } from "@/context/PortfolioContext";
+import { PROFILE_IMAGE_PATH } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GradientBlob } from "@/components/shared/GradientBlob";
-import { UploadableImage } from "@/components/shared/UploadableImage";
+import { StaticImage } from "@/components/shared/StaticImage";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const FALLBACK_SUBLINE = "Full Stack Web Developer (MERN)";
@@ -164,13 +165,13 @@ export function Hero() {
         </div>
 
         <div className="hero-zoom mx-auto w-full max-w-xs lg:max-w-sm" suppressHydrationWarning style={rise(0)}>
-          <UploadableImage
-            slot="profile"
-            id="profile"
+          <StaticImage
+            src={PROFILE_IMAGE_PATH}
             alt={`Portrait of ${profile.name}`}
             priority
+            initials="AT"
+            fallbackLabel="Photograph coming soon"
             className="aspect-square w-full rounded-2xl border border-card-border shadow-2xl"
-            fallbackLabel="Drop your photo at content/images/profile.jpg"
           />
         </div>
       </div>

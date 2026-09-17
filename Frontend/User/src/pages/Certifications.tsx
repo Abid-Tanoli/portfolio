@@ -16,7 +16,7 @@ export default function Certifications() {
         as="h1"
         eyebrow="Certifications"
         title="Credentials that back the craft"
-        description="Certificate scans can be dropped into content/images/certs — cards update automatically."
+        description="Verified courses and certificates — from Bano Qabil's backend, React, and web-development tracks to computerized accounting."
       />
       <CertificationsGrid />
     </section>

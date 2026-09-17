@@ -6,7 +6,6 @@
   "scripts": {
     "dev:user": "npm run dev --prefix Frontend/User",
     "build": "npm run build --prefix Frontend/User",
-    "build:user": "npm run build --prefix Frontend/User",
     "typecheck": "npm run build --prefix Frontend/User"
   }
 }

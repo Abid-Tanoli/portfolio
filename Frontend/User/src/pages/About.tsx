@@ -1,10 +1,11 @@
 import { usePortfolio } from "@/context/PortfolioContext";
+import { PROFILE_IMAGE_PATH } from "@/lib/constants";
 import { useSeo } from "@/lib/seo";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { ExperienceTimeline } from "@/components/sections/ExperienceTimeline";
 import { EducationTimeline } from "@/components/sections/EducationTimeline";
-import { UploadableImage } from "@/components/shared/UploadableImage";
+import { StaticImage } from "@/components/shared/StaticImage";
 import { Card } from "@/components/ui/card";
 
 export default function About() {
@@ -27,12 +28,12 @@ export default function About() {
         />
         <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[0.7fr_1.3fr]">
           <ScrollReveal>
-            <UploadableImage
-              slot="profile"
-              id="about"
+            <StaticImage
+              src={PROFILE_IMAGE_PATH}
               alt={`Portrait of ${profile.name}`}
+              initials="AT"
+              fallbackLabel="Photograph coming soon"
               className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl border border-card-border shadow-lg lg:max-w-none"
-              fallbackLabel="Drop your photo at content/images/profile.jpg"
             />
           </ScrollReveal>
           <div className="flex flex-col gap-5">

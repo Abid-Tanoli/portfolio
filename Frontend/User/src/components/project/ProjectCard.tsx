@@ -3,7 +3,7 @@ import { ExternalLink, GitFork, Star } from "lucide-react";
 import type { EnrichedProject } from "@/types/project";
 import { ProjectBadges } from "@/components/project/ProjectBadges";
 import { TechStackPills } from "@/components/project/TechStackPills";
-import { UploadableImage } from "@/components/shared/UploadableImage";
+import { StaticImage } from "@/components/shared/StaticImage";
 import { timeAgo } from "@/lib/utils";
 
 export function ProjectCard({ project }: { project: EnrichedProject }) {
@@ -12,10 +12,11 @@ export function ProjectCard({ project }: { project: EnrichedProject }) {
       to={`/projects/${project.slug}`}
       className="group glass-card flex h-full flex-col overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-2 focus-visible:outline-ring"
     >
-      <UploadableImage
-        slot="project"
-        id={`${project.slug}.png`}
-        alt={`${project.name} — project screenshot placeholder`}
+      <StaticImage
+        src={project.screenshotUrls?.[0]}
+        alt={`${project.name} — project screenshot`}
+        initials={project.name.slice(0, 2).toUpperCase()}
+        fallbackLabel="Screenshot coming soon"
         className="aspect-[16/9] w-full border-b border-card-border"
       />
       <div className="flex flex-1 flex-col gap-3 p-5">
