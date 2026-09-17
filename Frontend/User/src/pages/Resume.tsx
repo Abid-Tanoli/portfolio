@@ -1,6 +1,7 @@
 import { Printer } from "lucide-react";
 import { usePortfolio } from "@/context/PortfolioContext";
 import { projects } from "@/data/projects";
+import { SITE_URL } from "@/lib/constants";
 import { useSeo } from "@/lib/seo";
 import { Button } from "@/components/ui/button";
 
@@ -162,6 +163,9 @@ export default function Resume() {
             <Printer className="h-4 w-4" />
             Print / Save as PDF
           </Button>
+          <p className="mt-2 text-xs text-muted-foreground print:hidden">
+            Tip: Ctrl/Cmd+P → choose "Save as PDF" to download a clean copy.
+          </p>
         </div>
 
         <article className="resume-sheet mx-auto max-w-3xl print:max-w-none">
@@ -172,7 +176,7 @@ export default function Resume() {
           </div>
           <div className="rs-contact">
             {profile.location} · {profile.phoneDisplay} · {profile.email} ·
-            github.com/{profile.githubUsername}
+            github.com/{profile.githubUsername} · Portfolio: {SITE_URL.replace(/^https?:\/\//, "")}
           </div>
 
           <h2>Professional Summary</h2>

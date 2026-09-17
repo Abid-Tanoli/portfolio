@@ -10,6 +10,10 @@ export const navLinks = [
 
 export const PROFILE_IMAGE_PATH = "/content/images/profile.jpg";
 
+export const SITE_URL =
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_SITE_URL) ||
+  "http://187.127.96.220:8080";
+
 export const SITE_NAME = "Abid Ali Tanoli";
 export const SITE_TITLE = "Abid Ali Tanoli — Full Stack MERN Developer";
 export const SITE_DESCRIPTION =
