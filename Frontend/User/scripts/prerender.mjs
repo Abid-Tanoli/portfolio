@@ -19,6 +19,7 @@ const ROUTES = [
   "/projects/tourist-places-guide",
   "/certifications",
   "/resume",
+  "/resume/finance",
   "/github",
   "/contact",
 ];
@@ -83,6 +84,7 @@ function routeChunkName(route, chunkFiles) {
   else if (route === "/projects") prefix = "Projects";
   else if (route === "/about") prefix = "About";
   else if (route === "/certifications") prefix = "Certifications";
+  else if (route === "/resume/finance") prefix = "ResumeFinance";
   else if (route === "/resume") prefix = "Resume";
   else if (route === "/github") prefix = "Github";
   else if (route === "/contact") prefix = "Contact";

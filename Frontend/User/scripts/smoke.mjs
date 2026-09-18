@@ -13,6 +13,7 @@ const ROUTES = [
   "/projects/ecommerce",
   "/certifications",
   "/resume",
+  "/resume/finance",
   "/github",
   "/contact",
   "/does-not-exist",
@@ -42,7 +43,7 @@ for (const route of ROUTES) {
   page.on("pageerror", (e) => errors.push(`[pageerror] ${e.message}`));
   page.on("requestfailed", (r) => errors.push(`[requestfailed] ${r.url()} ${r.failure()?.errorText ?? ""}`));
   try {
-    const waitUntil = route === "/resume" ? "domcontentloaded" : "networkidle2";
+    const waitUntil = route === "/resume" || route === "/resume/finance" ? "domcontentloaded" : "networkidle2";
     await page.goto(`${BASE}${route}`, { waitUntil, timeout: 30000 });
     await new Promise((r) => setTimeout(r, 800));
     const title = await page.title();

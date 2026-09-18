@@ -49,6 +49,7 @@ const ProjectsModule = import("@/pages/Projects");
 const ProjectDetailModule = import("@/pages/ProjectDetail");
 const CertificationsModule = import("@/pages/Certifications");
 const ResumeModule = import("@/pages/Resume");
+const ResumeFinanceModule = import("@/pages/ResumeFinance");
 const ContactModule = import("@/pages/Contact");
 const GithubModule = import("@/pages/Github");
 const NotFoundModule = import("@/pages/NotFound");
@@ -59,6 +60,7 @@ const Projects = lazyRoute(ProjectsModule);
 const ProjectDetail = lazyRoute(ProjectDetailModule);
 const Certifications = lazyRoute(CertificationsModule);
 const Resume = lazyRoute(ResumeModule);
+const ResumeFinance = lazyRoute(ResumeFinanceModule);
 const Contact = lazyRoute(ContactModule);
 const Github = lazyRoute(GithubModule);
 const NotFound = lazyRoute(NotFoundModule);
@@ -74,6 +76,8 @@ export function preloadRoute(pathname: string): Promise<unknown> {
       return ProjectsModule;
     case "/certifications":
       return CertificationsModule;
+    case "/resume/finance":
+      return ResumeFinanceModule;
     case "/resume":
       return ResumeModule;
     case "/contact":
@@ -143,6 +147,7 @@ export default function App() {
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/projects/:slug" element={<ProjectDetail />} />
                 <Route path="/certifications" element={<Certifications />} />
+                <Route path="/resume/finance" element={<ResumeFinance />} />
                 <Route path="/resume" element={<Resume />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/github" element={<Github />} />

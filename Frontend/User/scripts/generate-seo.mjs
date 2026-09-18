@@ -49,6 +49,7 @@ const ROUTES = [
   ["/contact", 0.7],
   ["/certifications", 0.6],
   ["/resume", 0.6],
+  ["/resume/finance", 0.6],
   ["/github", 0.6],
 ];
 
